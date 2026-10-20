@@ -1,0 +1,84 @@
+/* Triverse design tokens and components. Tailwind utilities handle the rest. */
+:root {
+  --canvas: #0d1a1c;   /* page background: deep harbour teal */
+  --panel:  #142428;   /* image placeholders, inputs */
+  --rule:   #27403f;   /* hairlines */
+  --ink:    #e9efec;   /* text */
+  --muted:  #93a8a4;   /* secondary text */
+  --accent: #f2b632;   /* marigold: primary action, active state, cover highlights */
+  --accent-ink: #1a1403;
+}
+
+body { background: var(--canvas); color: var(--ink); }
+
+/* Layout primitives: one content width, one vertical rhythm */
+.wrap { max-width: 72rem; margin-inline: auto; padding-inline: 1rem; }
+.section { padding-block: 3rem; }
+@media (min-width: 640px) { .wrap { padding-inline: 1.5rem; } }
+@media (min-width: 768px) { .section { padding-block: 4.5rem; } }
+
+/* Accessibility */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.skip-link { position: absolute; left: -999px; top: 0; background: var(--accent); color: var(--accent-ink); padding: .5rem 1rem; z-index: 50; }
+.skip-link:focus { left: 1rem; top: 1rem; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: .7rem 1.25rem; font-weight: 600; font-size: .9375rem; border-radius: .375rem; border: 1px solid var(--rule); transition: background-color .15s, border-color .15s; }
+.btn:hover { border-color: var(--muted); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn-primary:hover { background: #ffc94d; border-color: #ffc94d; }
+
+/* Navigation */
+.nav-link { color: var(--muted); padding-block: .25rem; border-bottom: 2px solid transparent; }
+.nav-link:hover { color: var(--ink); }
+.nav-link.is-active { color: var(--ink); border-bottom-color: var(--accent); }
+
+/* Search field (header and catalog) */
+.search { border: 1px solid var(--rule); border-radius: .375rem; background: var(--panel); }
+.search:focus-within { border-color: var(--accent); }
+.search input { background: transparent; color: var(--ink); padding: .55rem .75rem; min-width: 0; flex: 1; outline: none; }
+.search input::placeholder { color: var(--muted); }
+.search button { padding: 0 .75rem; color: var(--muted); }
+.search button:hover { color: var(--accent); }
+
+/* Cover art: fixed 4:5 frame for every game, so grids stay even */
+.cover { display: block; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); border-radius: .25rem; }
+.cover > * { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cover-wide { aspect-ratio: 16 / 10; }
+.tile .cover > * { transition: transform .25s ease; }
+.tile:hover .cover > * { transform: scale(1.03); }
+.tile:hover .tile-title, .row-link:hover .row-title { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; }
+
+/* Index-style rows (categories, article lists) */
+.row-link { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-block: 1rem; border-bottom: 1px solid var(--rule); }
+.row-link:first-child { border-top: 1px solid var(--rule); }
+
+/* Filter chips */
+.chip { display: inline-block; padding: .35rem .85rem; border: 1px solid var(--rule); border-radius: 999px; font-size: .875rem; color: var(--muted); }
+.chip:hover { color: var(--ink); border-color: var(--muted); }
+.chip.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+/* Article text */
+.article-body p { margin-top: 1.25rem; line-height: 1.75; font-size: 1.0625rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  .tile:hover .cover > * { transform: none; }
+}
+
+/* Marketplace: status badges and filter fields */
+:root { --ok: #7dd3a8; }
+.badge { display: inline-block; padding: .1rem .55rem; border: 1px solid currentColor; border-radius: .25rem; font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.badge-available { color: var(--ok); }
+.badge-reserved  { color: var(--accent); }
+.badge-sold      { color: var(--muted); }
+.field-label { display: block; margin-bottom: .35rem; font-size: .8125rem; color: var(--muted); }
+.field { width: 100%; padding: .55rem .75rem; background: var(--panel); color: var(--ink); border: 1px solid var(--rule); border-radius: .375rem; }
+.field:focus { border-color: var(--accent); outline: none; }
+
+/* Top-up amount picker: a radio group styled as selectable rows */
+.pack { position: relative; display: flex; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; border: 1px solid var(--rule); border-radius: .375rem; cursor: pointer; }
+.pack:hover { border-color: var(--muted); }
+.pack input { position: absolute; opacity: 0; pointer-events: none; }
+.pack:has(input:checked) { border-color: var(--accent); background: var(--panel); }
+.pack:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
