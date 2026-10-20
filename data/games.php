@@ -1,77 +1,63 @@
 <?php
-// SAMPLE DATA. All titles, studios and descriptions are fictional.
-// Key = slug used in URLs (game-detail.php?id=<slug>).
-// 'art' = [background, shape, accent, motif] drives the generated cover.
-// To use a real image later, add 'image' => 'filename.jpg' (file in assets/images/).
+// DATA CONTOH untuk prototipe. Nama game adalah milik masing-masing penerbit;
+// situs ini tidak berafiliasi dengan mereka. Sampul digambar otomatis (bukan artwork resmi).
+// Key = slug di URL (game-detail.php?id=<slug>). 'art' = [latar, bentuk, aksen, motif].
+// Untuk memakai gambar sendiri: tambahkan 'image' => 'nama.jpg' (file di assets/images/).
 return [
-    'ashfall-pilgrim' => [
-        'title' => 'Ashfall Pilgrim', 'category' => 'RPG', 'genre' => 'Open-world action RPG',
-        'developer' => 'Cinderwake Studio', 'year' => 2025, 'platforms' => ['PC', 'Console'], 'modes' => 'Single-player',
-        'description' => 'Walk a volcanic coastline toward a shrine that is slowly sinking. Each settlement you help changes which routes stay open, so no two journeys end at the same gate.',
-        'tags' => ['exploration', 'story', 'crafting'], 'featured' => true,
-        'art' => ['#3a1a12', '#e0703a', '#f2b632', 'peaks'],
+    'mobile-legends' => [
+        'title' => 'Mobile Legends: Bang Bang', 'category' => 'MOBA', 'genre' => 'MOBA 5 lawan 5',
+        'developer' => 'Moonton', 'year' => 2016, 'platforms' => ['Android', 'iOS'], 'modes' => 'Multipemain online',
+        'description' => 'Game MOBA untuk ponsel dengan pertandingan singkat, banyak pilihan hero, dan mode ranked. Cocok dimainkan bersama tim atau teman.',
+        'tags' => ['tim', 'kompetitif', 'ponsel'], 'featured' => true,
+        'art' => ['#14264f', '#5b8cff', '#ffd166', 'crystal'],
     ],
-    'low-tide-protocol' => [
-        'title' => 'Low Tide Protocol', 'category' => 'Strategy', 'genre' => 'Naval tactics',
-        'developer' => 'Saltmarsh Interactive', 'year' => 2024, 'platforms' => ['PC'], 'modes' => 'Single-player, online versus',
-        'description' => 'Command a small fleet in shallow waters where the tide redraws the map every few turns. Short matches reward planning two moves ahead.',
-        'tags' => ['turn-based', 'naval', 'competitive'], 'featured' => false,
-        'art' => ['#0c2f3a', '#3fa7a0', '#f2b632', 'waves'],
+    'free-fire' => [
+        'title' => 'Free Fire', 'category' => 'Battle Royale', 'genre' => 'Battle royale',
+        'developer' => 'Garena', 'year' => 2017, 'platforms' => ['Android', 'iOS'], 'modes' => 'Multipemain online',
+        'description' => 'Battle royale untuk ponsel dengan pertandingan singkat dan karakter berkemampuan khusus. Bisa dimainkan solo, duo, atau skuad.',
+        'tags' => ['battle royale', 'tim', 'ponsel'], 'featured' => false,
+        'art' => ['#3b1d12', '#ff8a4c', '#ffd166', 'island'],
     ],
-    'quiet-signal' => [
-        'title' => 'Quiet Signal', 'category' => 'Puzzle', 'genre' => 'Audio puzzle',
-        'developer' => 'Mossy Pixel', 'year' => 2023, 'platforms' => ['PC', 'Mobile'], 'modes' => 'Single-player',
-        'description' => 'Tune a failing radio station by ear, piecing together a mystery from fragments of broadcasts. Headphones recommended.',
-        'tags' => ['mystery', 'relaxed', 'audio'], 'featured' => false,
-        'art' => ['#1d2a3d', '#8fb4d9', '#f2b632', 'rings'],
+    'pubg-mobile' => [
+        'title' => 'PUBG Mobile', 'category' => 'Battle Royale', 'genre' => 'Battle royale realistis',
+        'developer' => 'Krafton', 'year' => 2018, 'platforms' => ['Android', 'iOS'], 'modes' => 'Multipemain online',
+        'description' => 'Battle royale dengan peta luas, kendaraan, dan gaya bermain yang lebih realistis. Tersedia mode solo hingga skuad.',
+        'tags' => ['battle royale', 'tim', 'ponsel'], 'featured' => false,
+        'art' => ['#252c18', '#9bb34a', '#ffb454', 'zone'],
     ],
-    'redline-harbor' => [
-        'title' => 'Redline Harbor', 'category' => 'Racing', 'genre' => 'Arcade street racing',
-        'developer' => 'Redline Labs', 'year' => 2025, 'platforms' => ['PC', 'Console', 'Mobile'], 'modes' => 'Single-player, online',
-        'description' => 'Night races through a working container port, with cranes and ferries as moving obstacles. Handling is forgiving, so the focus stays on lines and timing.',
-        'tags' => ['arcade', 'night', 'drifting'], 'featured' => false,
-        'art' => ['#2b0d14', '#d2453b', '#f2b632', 'slash'],
+    'genshin-impact' => [
+        'title' => 'Genshin Impact', 'category' => 'RPG', 'genre' => 'RPG dunia terbuka',
+        'developer' => 'HoYoverse', 'year' => 2020, 'platforms' => ['Android', 'iOS', 'PC', 'PlayStation'], 'modes' => 'Single-player, co-op',
+        'description' => 'RPG dunia terbuka dengan banyak karakter yang bisa dikumpulkan dan dipadukan dalam satu tim. Bisa dimainkan sendiri atau bersama teman.',
+        'tags' => ['dunia terbuka', 'cerita', 'koleksi karakter'], 'featured' => false,
+        'art' => ['#0f3d4a', '#7fe3d0', '#ffe08a', 'floating'],
     ],
-    'vanta-sector' => [
-        'title' => 'Vanta Sector', 'category' => 'Shooter', 'genre' => 'Tactical team shooter',
-        'developer' => 'Parallax Games', 'year' => 2024, 'platforms' => ['PC', 'Console'], 'modes' => '5v5 online',
-        'description' => 'Five-on-five rounds on drifting space stations with destructible airlocks. Rounds are short and every loadout has a clear role.',
-        'tags' => ['team-based', 'competitive', 'sci-fi'], 'featured' => false,
-        'art' => ['#14211f', '#5bbf9a', '#f2b632', 'grid'],
+    'honkai-star-rail' => [
+        'title' => 'Honkai: Star Rail', 'category' => 'RPG', 'genre' => 'RPG turn-based',
+        'developer' => 'HoYoverse', 'year' => 2023, 'platforms' => ['Android', 'iOS', 'PC'], 'modes' => 'Single-player',
+        'description' => 'RPG turn-based bertema perjalanan antarbintang, dengan pertempuran bergiliran dan cerita yang berjalan lewat banyak dunia.',
+        'tags' => ['turn-based', 'cerita', 'koleksi karakter'], 'featured' => false,
+        'art' => ['#1a1b3a', '#8aa4ff', '#ffb3e6', 'rail'],
     ],
-    'hollow-lantern' => [
-        'title' => 'Hollow Lantern', 'category' => 'Co-op', 'genre' => 'Cooperative dungeon crawler',
-        'developer' => 'Duskbound', 'year' => 2025, 'platforms' => ['PC', 'Console'], 'modes' => '1-4 players co-op',
-        'description' => 'One lantern, four players. Whoever holds the light cannot fight, so the group trades roles room by room.',
-        'tags' => ['co-op', 'dungeon', 'friends'], 'featured' => false,
-        'art' => ['#1b1626', '#a68cd6', '#f2b632', 'dots'],
+    'valorant' => [
+        'title' => 'Valorant', 'category' => 'Shooter', 'genre' => 'Shooter taktis 5 lawan 5',
+        'developer' => 'Riot Games', 'year' => 2020, 'platforms' => ['PC'], 'modes' => 'Multipemain online',
+        'description' => 'Game tembak-menembak taktis di mana tiap agen punya kemampuan khusus. Satu ronde menuntut koordinasi dan penguasaan peta.',
+        'tags' => ['tim', 'kompetitif', 'taktis'], 'featured' => false,
+        'art' => ['#3a0f1a', '#ff4d5e', '#f4efe6', 'agent'],
     ],
-    'glasswing-saga' => [
-        'title' => 'Glasswing Saga', 'category' => 'RPG', 'genre' => 'Turn-based RPG',
-        'developer' => 'Lumen Works', 'year' => 2022, 'platforms' => ['PC', 'Mobile'], 'modes' => 'Single-player',
-        'description' => 'A party-based adventure with a hand-painted world and a battle system built on elemental timing. Side quests carry as much story as the main path.',
-        'tags' => ['story', 'turn-based', 'party'], 'featured' => false,
-        'art' => ['#10282b', '#7dd0c4', '#f2b632', 'rings'],
+    'call-of-duty-mobile' => [
+        'title' => 'Call of Duty: Mobile', 'category' => 'Shooter', 'genre' => 'Shooter multipemain',
+        'developer' => 'TiMi Studio Group', 'year' => 2019, 'platforms' => ['Android', 'iOS'], 'modes' => 'Multipemain online',
+        'description' => 'Game tembak-menembak yang membawa mode multipemain dan battle royale ke ponsel dengan kontrol yang bisa disesuaikan.',
+        'tags' => ['tim', 'kompetitif', 'ponsel'], 'featured' => false,
+        'art' => ['#18231a', '#6fbf73', '#ffcf5a', 'ops'],
     ],
-    'brickwork-kingdoms' => [
-        'title' => 'Brickwork Kingdoms', 'category' => 'Strategy', 'genre' => 'City-building strategy',
-        'developer' => 'Saltmarsh Interactive', 'year' => 2023, 'platforms' => ['PC', 'Mobile'], 'modes' => 'Single-player',
-        'description' => 'Grow a walled town from a single well, balancing food, trade and defense. Seasons force trade-offs, and slow play is rewarded.',
-        'tags' => ['building', 'management', 'relaxed'], 'featured' => false,
-        'art' => ['#2a2314', '#d9a441', '#e9efec', 'grid'],
-    ],
-    'night-courier' => [
-        'title' => 'Night Courier', 'category' => 'Racing', 'genre' => 'Delivery racing',
-        'developer' => 'Redline Labs', 'year' => 2024, 'platforms' => ['Mobile', 'PC'], 'modes' => 'Single-player',
-        'description' => 'Deliver parcels across a sleeping city on a scooter. Rain, traffic lights and a ticking schedule make each route a small puzzle.',
-        'tags' => ['delivery', 'city', 'casual'], 'featured' => false,
-        'art' => ['#0f2433', '#4d9de0', '#f2b632', 'slash'],
-    ],
-    'split-shift' => [
-        'title' => 'Split Shift', 'category' => 'Co-op', 'genre' => 'Kitchen chaos co-op',
-        'developer' => 'Mossy Pixel', 'year' => 2025, 'platforms' => ['PC', 'Console'], 'modes' => '2-4 players, local and online',
-        'description' => 'Run a restaurant whose layout changes mid-service. Communication matters more than speed, and the rules stay simple enough for new players.',
-        'tags' => ['party', 'local co-op', 'casual'], 'featured' => false,
-        'art' => ['#2a1a0d', '#e0903a', '#e9efec', 'dots'],
+    'clash-of-clans' => [
+        'title' => 'Clash of Clans', 'category' => 'Strategi', 'genre' => 'Strategi membangun desa',
+        'developer' => 'Supercell', 'year' => 2012, 'platforms' => ['Android', 'iOS'], 'modes' => 'Online, klan',
+        'description' => 'Bangun desa, latih pasukan, lalu serang desa pemain lain atau bergabung dalam klan untuk perang antarklan.',
+        'tags' => ['strategi', 'klan', 'ponsel'], 'featured' => false,
+        'art' => ['#1d3a2a', '#7bd16b', '#ffd34d', 'castle'],
     ],
 ];

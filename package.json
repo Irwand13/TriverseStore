@@ -1,0 +1,14 @@
+{
+  "name": "triverse-store",
+  "private": true,
+  "description": "Hanya untuk membangun CSS (Tailwind + Basecoat). Aplikasi tetap berjalan di PHP tanpa Node.",
+  "scripts": {
+    "build:css": "tailwindcss -i assets/css/input.css -o assets/css/app.css --minify",
+    "watch:css": "tailwindcss -i assets/css/input.css -o assets/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "basecoat-css": "1.0.0",
+    "tailwindcss": "4.3.3"
+  }
+}

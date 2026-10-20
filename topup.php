@@ -1,22 +1,27 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 $pageTitle = 'Top up';
-$pageDescription = 'Choose a game and an amount, then review your order. Prototype with sample prices.';
+$pageDescription = 'Pilih game dan nominal, lalu tinjau pesanan. Prototipe dengan harga contoh.';
 include __DIR__ . '/includes/head.php';
 include __DIR__ . '/includes/navbar.php';
 ?>
-<main id="main" class="wrap section">
-  <h1 class="font-display text-3xl font-semibold md:text-4xl">Top up</h1>
-  <p class="mt-3 max-w-xl text-muted">Pick a game, choose an amount and enter your game ID to review the order. Prices are sample data, and no order or payment is made in this prototype.</p>
+<main id="main">
+  <header class="border-b border-border bg-card/40">
+    <div class="wrap py-10 md:py-14" data-reveal>
+      <h1 class="font-display text-3xl font-semibold md:text-5xl">Top up</h1>
+      <p class="mt-3 max-w-xl text-muted-foreground">Pilih game, tentukan nominal, lalu masukkan ID game untuk meninjau pesanan. Harga hanya contoh, dan belum ada pesanan atau pembayaran yang diproses di prototipe ini.</p>
+    </div>
+  </header>
+  <div class="wrap section">
 
-  <div class="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
-    <?php foreach (topups() as $slug => $cfg): $g = games()[$slug]; ?>
-      <a href="topup-game.php?id=<?= e(urlencode($slug)) ?>" class="tile block">
-        <span class="cover"><?= cover_art($g) ?></span>
-        <span class="mt-3 block font-display text-base font-semibold tile-title"><?= e($g['title']) ?></span>
-        <span class="block text-sm text-muted"><?= e($cfg['currency']) ?> &middot; from <?= e(format_rupiah(topup_from_price($cfg))) ?></span>
-      </a>
-    <?php endforeach; ?>
+  <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    <?php foreach (topups() as $slug => $cfg):
+        $game = games()[$slug];
+        $cardHref = 'topup-game.php?id=' . urlencode($slug);
+        $cardNote = $cfg['currency'] . ' · mulai ' . format_rupiah(topup_from_price($cfg));
+        include __DIR__ . '/includes/game-card.php';
+    endforeach; ?>
   </div>
+</div>
 </main>
 <?php include __DIR__ . '/includes/footer.php'; ?>

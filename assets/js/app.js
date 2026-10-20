@@ -15,3 +15,17 @@
     if (event.key === 'Escape') { setOpen(false); button.focus(); }
   });
 })();
+
+// Animasi muncul saat elemen masuk layar. Jika gagal, semua elemen ditampilkan setelah 2,5 detik.
+(function () {
+  var items = document.querySelectorAll('[data-reveal]');
+  function show(el) { el.classList.add('is-visible'); }
+  if (!('IntersectionObserver' in window)) { items.forEach(show); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) { show(entry.target); io.unobserve(entry.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  items.forEach(function (el) { io.observe(el); });
+  setTimeout(function () { items.forEach(show); }, 2500);
+})();

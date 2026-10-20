@@ -1,0 +1,8 @@
+/* Sumber CSS. Hasil build: assets/css/app.css (jangan diedit langsung). */
+@import "tailwindcss";
+@import "basecoat-css";          /* komponen gaya shadcn/ui (Basecoat) */
+@import "./style.css";           /* tema dan gaya khusus Triverse */
+
+/* Tailwind memindai file PHP untuk mencari nama class yang dipakai */
+@source "../../*.php";
+@source "../../includes/*.php";

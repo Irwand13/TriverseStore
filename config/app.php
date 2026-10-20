@@ -1,7 +1,7 @@
 <?php
-// App-wide settings. When a database is added later, its settings belong here
-// (read passwords from environment variables, never commit them).
+// Pengaturan umum situs. Nanti pengaturan database juga ditaruh di sini
+// (baca kata sandi dari environment variable, jangan di-commit).
 return [
     'name'    => 'Triverse Store',
-    'tagline' => 'A game catalog and newsroom.',
+    'tagline' => 'Top up game dan marketplace akun game.',
 ];

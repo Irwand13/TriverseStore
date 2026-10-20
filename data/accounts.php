@@ -1,77 +1,77 @@
 <?php
-// SAMPLE LISTINGS. Fictional accounts, sellers and prices.
-// 'game' must be a slug from data/games.php. Passwords and login credentials are
-// deliberately NOT part of this data and must never be shown on a listing page.
-// status: available | reserved | sold      category: Starter | Mid-game | Endgame | Collector
+// LISTING CONTOH. Akun, penjual, dan harga hanya fiktif.
+// 'game' harus slug dari data/games.php. Kata sandi/kredensial login SENGAJA tidak ada di data ini
+// dan tidak boleh ditampilkan di halaman listing.
+// status: available | reserved | sold      category: Pemula | Menengah | Lanjutan | Koleksi
 return [
-    'ashfall-lv48-pilgrim' => [
-        'title' => 'Level 48 pilgrim, northern shrine unlocked', 'game' => 'ashfall-pilgrim', 'category' => 'Mid-game',
-        'price' => 850000, 'status' => 'available', 'level' => 'Level 48', 'region' => 'Asia', 'login' => 'Email-linked',
-        'items' => ['Ember sword (rare)', '6 of 9 settlements allied', 'Full coastal map revealed'],
-        'description' => 'A steady mid-game save that has finished the coastal chapters. The northern shrine route is open, so the next story arc can start right away.',
-        'seller' => 'mira_kayu', 'listed' => '2026-10-15',
+    'mlbb-mythic-72-hero' => [
+        'title' => 'Rank Mythic, 72 hero dan 90 skin', 'game' => 'mobile-legends', 'category' => 'Lanjutan',
+        'price' => 2400000, 'status' => 'available', 'level' => 'Rank Mythic', 'region' => 'Indonesia', 'login' => 'Terhubung via email',
+        'items' => ['72 hero terbuka', '90 skin', 'Emblem sudah dinaikkan'],
+        'description' => 'Akun ranked yang aktif dengan koleksi hero luas, jadi pemilik baru bisa langsung bermain tanpa mengumpulkan hero dari awal.',
+        'seller' => 'rizky_mlbb', 'listed' => '2026-10-17',
     ],
-    'ashfall-lv12-fresh' => [
-        'title' => 'Fresh start with early gear pack', 'game' => 'ashfall-pilgrim', 'category' => 'Starter',
-        'price' => 150000, 'status' => 'available', 'level' => 'Level 12', 'region' => 'Asia', 'login' => 'Email-linked',
-        'items' => ['Starter armour set', 'Tutorial region cleared'],
-        'description' => 'A lightly played account for someone who wants to skip the tutorial hours. Nothing rare, which is reflected in the price.',
-        'seller' => 'dimas_play', 'listed' => '2026-10-10',
+    'mlbb-epic-45-hero' => [
+        'title' => 'Rank Epic dengan 45 hero', 'game' => 'mobile-legends', 'category' => 'Menengah',
+        'price' => 650000, 'status' => 'available', 'level' => 'Rank Epic', 'region' => 'Indonesia', 'login' => 'Terhubung via email',
+        'items' => ['45 hero terbuka', '20 skin'],
+        'description' => 'Akun tengah-tengah yang cocok sebagai dasar untuk mulai naik rank.',
+        'seller' => 'nanda_g', 'listed' => '2026-10-11',
     ],
-    'vanta-diamond-rank' => [
-        'title' => 'Diamond-rank operator roster, all agents', 'game' => 'vanta-sector', 'category' => 'Endgame',
-        'price' => 2750000, 'status' => 'available', 'level' => 'Rank Diamond', 'region' => 'Asia', 'login' => 'Social login',
-        'items' => ['All 18 operators unlocked', '40 weapon skins', 'Two seasonal event sets'],
-        'description' => 'A fully unlocked roster at a competitive rank. The seller notes the account has no past penalties.',
-        'seller' => 'rafi_vanta', 'listed' => '2026-10-17',
+    'mlbb-warrior-baru' => [
+        'title' => 'Akun baru dengan beberapa hero dasar', 'game' => 'mobile-legends', 'category' => 'Pemula',
+        'price' => 120000, 'status' => 'sold', 'level' => 'Rank Warrior', 'region' => 'Indonesia', 'login' => 'Terhubung via email',
+        'items' => ['12 hero terbuka'],
+        'description' => 'Listing ini sudah terjual dan tetap ditampilkan sebagai contoh bagaimana status "Terjual" ditandai.',
+        'seller' => 'dimas_play', 'listed' => '2026-09-20',
     ],
-    'vanta-gold-starter' => [
-        'title' => 'Gold-rank account with six operators', 'game' => 'vanta-sector', 'category' => 'Mid-game',
-        'price' => 520000, 'status' => 'reserved', 'level' => 'Rank Gold', 'region' => 'Asia', 'login' => 'Email-linked',
-        'items' => ['6 operators unlocked', '12 weapon skins'],
-        'description' => 'A good base for a player who wants to start ranked play without grinding for operators.',
-        'seller' => 'nanda_g', 'listed' => '2026-10-05',
+    'ff-heroic-koleksi' => [
+        'title' => 'Rank Heroic dengan bundle langka', 'game' => 'free-fire', 'category' => 'Koleksi',
+        'price' => 1800000, 'status' => 'available', 'level' => 'Rank Heroic', 'region' => 'Indonesia', 'login' => 'Login sosial',
+        'items' => ['6 bundle langka', '25 senjata skin', 'Koleksi karakter lengkap'],
+        'description' => 'Dibuat untuk kolektor. Beberapa bundle di akun ini tidak lagi dijual di toko dalam game.',
+        'seller' => 'bayu_ff', 'listed' => '2026-10-14',
     ],
-    'glasswing-completionist' => [
-        'title' => 'Completed story, all party members maxed', 'game' => 'glasswing-saga', 'category' => 'Endgame',
-        'price' => 1900000, 'status' => 'available', 'level' => 'Level 90', 'region' => 'Global', 'login' => 'Email-linked',
-        'items' => ['All 12 party members at max level', 'Every side quest finished', 'New Game+ unlocked'],
-        'description' => 'A finished save, useful for players who want to try late-game builds instead of replaying the whole story.',
-        'seller' => 'sari_wing', 'listed' => '2026-09-29',
+    'ff-gold-menengah' => [
+        'title' => 'Rank Gold dengan 8 karakter', 'game' => 'free-fire', 'category' => 'Menengah',
+        'price' => 350000, 'status' => 'reserved', 'level' => 'Rank Gold', 'region' => 'Indonesia', 'login' => 'Login sosial',
+        'items' => ['8 karakter', '10 senjata skin'],
+        'description' => 'Akun siap main dengan beberapa karakter pilihan, cocok untuk pemain yang ingin berlatih di mode ranked.',
+        'seller' => 'putri_ff', 'listed' => '2026-10-06',
     ],
-    'glasswing-early-party' => [
-        'title' => 'Chapter 3 save with four party members', 'game' => 'glasswing-saga', 'category' => 'Starter',
-        'price' => 200000, 'status' => 'sold', 'level' => 'Level 21', 'region' => 'Global', 'login' => 'Email-linked',
-        'items' => ['4 party members', 'Chapter 3 reached'],
-        'description' => 'This listing has been sold and stays visible as an example of how sold items are marked.',
-        'seller' => 'sari_wing', 'listed' => '2026-09-18',
+    'pubg-conqueror-langka' => [
+        'title' => 'Rank Conqueror, set pakaian langka', 'game' => 'pubg-mobile', 'category' => 'Lanjutan',
+        'price' => 3100000, 'status' => 'available', 'level' => 'Rank Conqueror', 'region' => 'Asia', 'login' => 'Terhubung via email',
+        'items' => ['Set pakaian langka', 'Skin senjata level maksimal', 'Banyak kartu pengaturan nama'],
+        'description' => 'Akun ranked tinggi dengan koleksi kosmetik yang sulit didapat lagi di musim sekarang.',
+        'seller' => 'agus_pubg', 'listed' => '2026-10-12',
     ],
-    'redline-garage-collector' => [
-        'title' => 'Garage of 31 cars including limited liveries', 'game' => 'redline-harbor', 'category' => 'Collector',
-        'price' => 3200000, 'status' => 'available', 'level' => 'Level 70', 'region' => 'Asia', 'login' => 'Social login',
-        'items' => ['31 cars', '5 limited-edition liveries', 'Harbor season champion title'],
-        'description' => 'Built for collectors rather than racers. The limited liveries are no longer obtainable in the current season.',
-        'seller' => 'bayu_redline', 'listed' => '2026-10-12',
+    'genshin-ar55' => [
+        'title' => 'Adventure Rank 55, 18 karakter bintang 5', 'game' => 'genshin-impact', 'category' => 'Lanjutan',
+        'price' => 2900000, 'status' => 'available', 'level' => 'Adventure Rank 55', 'region' => 'Asia', 'login' => 'Terhubung via email',
+        'items' => ['18 karakter bintang 5', 'Beberapa senjata bintang 5', 'Peta dunia hampir lengkap'],
+        'description' => 'Akun tahap akhir dengan banyak karakter, cocok untuk pemain yang ingin mencoba berbagai susunan tim tanpa mengulang dari awal.',
+        'seller' => 'sari_wing', 'listed' => '2026-10-15',
     ],
-    'lantern-veteran' => [
-        'title' => 'Veteran lantern-bearer with rare light skins', 'game' => 'hollow-lantern', 'category' => 'Mid-game',
-        'price' => 430000, 'status' => 'available', 'level' => 'Level 35', 'region' => 'Asia', 'login' => 'Email-linked',
-        'items' => ['3 rare lantern skins', 'All four roles unlocked'],
-        'description' => 'A co-op account with every role unlocked, which makes it easy to fill whichever slot your group needs.',
-        'seller' => 'putri_dusk', 'listed' => '2026-10-14',
+    'genshin-ar30' => [
+        'title' => 'Adventure Rank 30 dengan 5 karakter bintang 5', 'game' => 'genshin-impact', 'category' => 'Menengah',
+        'price' => 700000, 'status' => 'reserved', 'level' => 'Adventure Rank 30', 'region' => 'Asia', 'login' => 'Terhubung via email',
+        'items' => ['5 karakter bintang 5', 'Quest utama bab awal selesai'],
+        'description' => 'Akun tengah dengan beberapa karakter kuat dan cerita yang masih panjang untuk dijalani.',
+        'seller' => 'mira_kayu', 'listed' => '2026-10-04',
     ],
-    'brickwork-grand-charter' => [
-        'title' => 'Grand Charter town, three seasons in', 'game' => 'brickwork-kingdoms', 'category' => 'Endgame',
-        'price' => 1250000, 'status' => 'reserved', 'level' => 'Town level 20', 'region' => 'Global', 'login' => 'Email-linked',
-        'items' => ['Grand Charter unlocked', 'All trade routes open', '2 exclusive banners'],
-        'description' => 'A mature town with every trade route open, ready for the late-game defense scenarios.',
-        'seller' => 'agus_brick', 'listed' => '2026-10-02',
+    'hsr-tl60' => [
+        'title' => 'Trailblaze Level 60, cerita utama tamat', 'game' => 'honkai-star-rail', 'category' => 'Menengah',
+        'price' => 950000, 'status' => 'available', 'level' => 'Trailblaze Level 60', 'region' => 'Asia', 'login' => 'Terhubung via email',
+        'items' => ['10 karakter bintang 5', 'Cerita utama tamat'],
+        'description' => 'Akun dengan cerita utama yang sudah selesai dan tim yang seimbang untuk mode endgame.',
+        'seller' => 'putri_dusk', 'listed' => '2026-10-18',
     ],
-    'night-courier-starter' => [
-        'title' => 'Starter scooter set, first district cleared', 'game' => 'night-courier', 'category' => 'Starter',
-        'price' => 175000, 'status' => 'available', 'level' => 'Level 9', 'region' => 'Asia', 'login' => 'Social login',
-        'items' => ['3 scooters', 'First district cleared'],
-        'description' => 'A small account for trying the game with a few upgrades already in place.',
-        'seller' => 'dimas_play', 'listed' => '2026-10-18',
+    'valorant-immortal-koleksi' => [
+        'title' => 'Rank Immortal dengan koleksi skin senjata', 'game' => 'valorant', 'category' => 'Lanjutan',
+        'price' => 2200000, 'status' => 'available', 'level' => 'Rank Immortal', 'region' => 'Asia Pasifik', 'login' => 'Terhubung via email',
+        'items' => ['Banyak skin senjata', 'Semua agen terbuka'],
+        'description' => 'Akun ranked tinggi dengan semua agen terbuka, jadi tidak perlu mengumpulkan agen dari awal.',
+        'seller' => 'rafi_vanta', 'listed' => '2026-10-09',
     ],
 ];
