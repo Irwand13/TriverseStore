@@ -1,104 +1,118 @@
-# Triverse Store
+# Week 7 — Sprint 06: MVC — From OOP to MVC
 
-Prototipe platform **top up game** dan **marketplace akun game**, dilengkapi katalog game dan artikel panduan.
-Dibuat dengan HTML5, CSS3, Tailwind CSS, PHP, dan sedikit JavaScript vanilla. Tampilan memakai **komponen gaya shadcn/ui lewat [Basecoat](https://basecoatui.com)** (versi HTML + Tailwind, tanpa React).
+**Penanggung jawab:** Alfino14 · **Branch acuan:** `week7`
 
-**Status:** semua data (game, listing, penjual, harga, artikel) adalah **data contoh** di file PHP. Belum ada database, login, pembayaran, atau integrasi API. Tidak ada tombol yang berpura-pura memproses transaksi.
+## Tema Sprint
 
-## Cara menjalankan
-
-Butuh PHP 8.0 atau lebih baru, dan koneksi internet (untuk Tailwind dan font, lihat bagian keterbatasan).
-
-**Terminal:**
-```bash
-cd TriverseStore
-php -S localhost:8000
-```
-Buka http://localhost:8000/index.php
-
-**XAMPP / Laragon:** taruh folder di `htdocs` (XAMPP) atau `www` (Laragon), jalankan Apache, lalu buka `http://localhost/TriverseStore/`.
-
-Live Server di VS Code tidak bisa menjalankan PHP.
-
-## Halaman
-
-| File | Fungsi |
-|---|---|
-| `index.php` | Beranda: pengantar, game unggulan, top up, listing terbaru, kategori, berita |
-| `topup.php` | Daftar game yang bisa di-top up, dengan harga terendah |
-| `topup-game.php` | `?id=<slug>`: pilih nominal, isi ID game (dan server), lalu tinjau pesanan. Form POST divalidasi di PHP dan berakhir di pratinjau |
-| `marketplace.php` | Listing akun dengan filter: pencarian, game, kategori, rentang harga, urutan |
-| `account-detail.php` | `?id=<slug>`: detail listing, isi akun, status, catatan privasi |
-| `catalog.php` | Katalog game dengan pencarian dan filter kategori |
-| `game-detail.php` | `?id=<slug>`: detail game dan game terkait |
-| `news.php`, `news-detail.php` | Daftar dan isi artikel contoh |
-
-## Struktur
+Mengorganisasi aplikasi PHP OOP Week 6 ke arsitektur **MVC**: tanggung
+jawab dipisah menjadi **Model** (data), **View** (tampilan), dan
+**Controller** (pengatur alur). Alur request-nya:
 
 ```
-includes/   head.php, navbar.php, footer.php, game-card.php, account-card.php, not-found.php, functions.php
-data/       games.php, accounts.php, topup.php, news.php   data contoh, terpisah dari template
-config/     app.php                                       nama dan tagline situs
-assets/     css/input.css (sumber), css/style.css (tema), css/app.css (hasil build), js/app.js, images/
-package.json  hanya untuk build CSS
+User → request → Controller → meminta data ke Model → Model mengembalikan
+data → Controller meneruskan ke View → View menghasilkan HTML → User
 ```
 
-`includes/functions.php` berisi semua fungsi bantu: `e()` (pembungkus `htmlspecialchars`), pemuat data, validasi slug, pencarian, validasi form top up, dan generator sampul. Halaman hanya berisi markup dan sedikit logika.
+Hasil akhir di layar **identik** dengan Week 6 — yang berubah hanya
+organisasi kodenya. Week ini adalah jembatan langsung ke Laravel (framework
+MVC) yang dipakai proyek TriverseStore sebenarnya.
 
-## Tentang data contoh
+## Pemetaan Sub-Tugas
 
-- **Gambar:** belum ada artwork resmi, jadi tiap game punya ilustrasi SVG buatan sendiri (kristal untuk MOBA, pulau dan parasut untuk battle royale, pulau melayang untuk RPG dunia terbuka, dan seterusnya) yang digambar oleh `art_scene()` di `includes/functions.php`. Ada tiga bentuk: `portrait` (kartu), `wide` (artikel, ubin kategori), dan `banner` (hero dan header halaman detail).
-- **Game:** memakai nama game populer di Indonesia supaya alurnya terasa nyata. Nama game milik masing-masing penerbit, dan situs ini tidak berafiliasi dengan mereka. Sampul adalah ilustrasi buatan, **bukan artwork resmi**.
-- **Harga dan nominal top up** di `data/topup.php` hanya contoh, bukan harga resmi. **Format ID** (panjang digit, Zone ID, pilihan server) adalah perkiraan; cek ke dokumentasi penyedia top up sebelum dipakai sungguhan.
-- **Listing akun, penjual, dan artikel** sepenuhnya fiktif. Tanggal hanya penanda. Tidak ada rating, jumlah pengguna, atau statistik karangan.
-- **Kredensial login tidak ada di data** dan tidak pernah ditampilkan. Halaman listing menyatakan bahwa serah terima akun dan penanganan sengketa akan dirancang bersama sistem pesanan, dan bahwa aturan penerbit soal pemindahan akun bisa berbeda.
+| Kode | Sub-Tugas | Penerapan di folder ini |
+|------|-----------|-------------------------|
+| W7.1 | Desain Struktur MVC | Folder `app/Models`, `app/Views`, `app/Controllers` memisahkan tiga tanggung jawab; `public/` menjadi satu-satunya folder yang diekspos server (front controller + aset). |
+| W7.2 | Bangun Model & Controller | Model `Game` (typed property + method akses data statis `all()`, `find()`, `filter()`, `related()`), Model `Seller` & `Cart`; `GameController` dengan method `index()`, `show()`, `process()`, `notFound()`. |
+| W7.3 | Bangun View & Hubungkan Alur Penuh | View di `app/Views/games/` menampilkan data dari Controller dengan short echo `<?= ?>`; View tidak pernah mengambil data sendiri. Alur request → Controller → Model → View berjalan untuk katalog, detail, dan 404. |
+| W7.4 | Demo MVC Flow & Review Sprint 06 | Lihat pertanyaan demo di bawah. |
 
-Untuk memakai gambar sendiri (misalnya poster yang kamu punya izin memakainya), taruh file di `assets/images/` dan tambahkan `'image' => 'nama.jpg'` pada data game. Gambar itu akan dipakai di semua tempat sampul tampil; ilustrasi SVG hanya jadi cadangan. Jika file tidak ada, sampul SVG dipakai.
+## Struktur Folder
 
-## Desain
-
-Konsep: katalog dan etalase, bukan halaman promosi. Tata letak rata kiri, garis tipis, dan daftar berbentuk indeks. Latar teal gelap dengan satu warna aksen (kuning marigold) untuk tombol utama, menu aktif, dan sorotan. Font: Chakra Petch (judul) dan Figtree (isi). Token warna ada di `assets/css/style.css`.
-
-## Keamanan dasar
-
-- Semua output dinamis lewat `e()`.
-- Parameter `id`, `q`, `category`, `game`, `min`, `max`, `sort` divalidasi: slug hanya `[a-z0-9-]`, kategori dan game harus ada di data, angka harus bilangan bulat, teks dipangkas dan dibatasi panjangnya, nilai non-teks (array) diabaikan.
-- Form top up mengecek nominal terhadap daftar milik game itu sendiri, sehingga nilai yang diubah-ubah ditolak. Data yang diisi tidak disimpan.
-- ID tidak dikenal menghasilkan halaman 404 yang sebenarnya.
-
-## UI: shadcn/ui lewat Basecoat
-
-shadcn/ui asli adalah komponen React, sehingga tidak bisa dipakai di proyek ini. **Basecoat** (`basecoat-css`) adalah implementasi shadcn/ui untuk HTML biasa + Tailwind: token tema sama (`--primary`, `--border`, `--ring`, ...) dan markup semantik. Yang dipakai: `btn`, `card`, `badge`, `alert`, `breadcrumb`, `field`, `input`, `select`, dan radio. Tidak ada JavaScript Basecoat yang dimuat.
-
-Tema ada di `assets/css/style.css` (blok `.dark`): `--primary` kuning marigold, `--background` teal gelap. Situs selalu gelap (`<html class="dark">`).
-
-Contoh markup (lihat `includes/functions.php` untuk helper `breadcrumb()`, `ui_alert()`, `status_badge()`):
-```html
-<a class="btn" href="#">Utama</a>
-<a class="btn" data-variant="outline" data-size="sm" href="#">Garis tepi</a>
-<span class="badge" data-variant="secondary">Dipesan</span>
-<div class="field"><label for="x">Label</label><input id="x" class="input"></div>
+```
+week7/
+├── public/
+│   ├── index.php         # FRONT CONTROLLER: satu-satunya pintu masuk (?page=)
+│   ├── css/style.css     # Salinan file CSS yang sama sejak Week 2
+│   └── assets/img/       # Gambar yang sama persis dengan week sebelumnya
+├── app/
+│   ├── Models/
+│   │   ├── Game.php      # Class Week 6 + method akses data (all/find/filter/related)
+│   │   ├── Seller.php    # Class Week 6, kini berperan sebagai Model
+│   │   └── Cart.php      # Class Week 6, kini berperan sebagai Model
+│   ├── Controllers/
+│   │   └── GameController.php   # index(), show(), process(), notFound()
+│   └── Views/
+│       ├── layout.php    # Kerangka HTML + renderLayout() (head/header/footer)
+│       ├── helpers.php   # formatRupiah() + renderKartuProduk() untuk View
+│       ├── games/
+│       │   ├── index.php # View katalog
+│       │   └── detail.php# View detail produk
+│       └── errors/
+│           └── 404.php   # View tidak ditemukan
+└── README.md
 ```
 
-## CSS: dikompilasi, bukan CDN
+Tidak ada folder `includes/` atau `data/` lagi: partial header/footer
+menjadi `layout.php`, dan file data menjadi tanggung jawab Model.
 
-`assets/css/app.css` adalah hasil build Tailwind v4 + Basecoat dan **sudah disertakan**, jadi situs langsung jalan tanpa Node. Node hanya dibutuhkan jika kamu mengubah gaya atau menambah class Tailwind baru:
+## Cara Menjalankan
 
-```bash
-npm install            # sekali saja
-npm run build:css      # bangun ulang assets/css/app.css
-npm run watch:css      # bangun ulang otomatis saat file berubah
+Document root diarahkan ke `public/`:
+
+```bat
+php -S localhost:8000 -t public
 ```
-Edit `assets/css/style.css` (tema dan gaya khusus) atau template PHP, **jangan** edit `app.css` langsung. Node hanya alat build CSS, bukan backend aplikasi.
 
-Yang masih dari internet: font Google (Chakra Petch dan Figtree), yang jatuh ke font sistem jika gagal dimuat.
+(dari folder `week7/`), lalu buka `http://localhost:8000`.
+Rute: katalog = `index.php`, detail = `index.php?page=detail&id=P1`,
+rute tak dikenal = 404. PHP 8.2, tanpa database/framework.
 
-## Yang sudah diuji
+## Poin Penjelasan untuk Dosen
 
-Dengan PHP 8.3 CLI dan server bawaannya: sintaks semua file PHP; status HTTP semua halaman; pencarian dan filter katalog dan marketplace (termasuk min/max yang tertukar, urutan harga, dan parameter sampah atau array); ID tidak valid menghasilkan 404 (termasuk `../`); form top up dengan input valid dan tidak valid untuk game dengan Zone ID, dengan pilihan server, dan tanpa server; nominal yang diubah-ubah; escape payload `<script>`; nilai form tetap setelah error; tidak ada warning PHP; semua tautan dan aset lokal bisa dibuka; tidak ada sisa teks antarmuka berbahasa Inggris.
+1. **Fungsi tiap komponen:** Model mengelola data (dataset + cara
+   mengambilnya), Controller mengatur proses (membaca parameter request,
+   memutuskan View mana dan data apa), View hanya menampilkan.
+2. **Komunikasi Controller ↔ Model:** Controller memanggil method Model
+   (`Game::filter(...)`, `Game::find(...)`) dan menerima objek kembali —
+   Controller tidak tahu (dan tidak peduli) dari mana data berasal.
+3. **Komunikasi Controller → View:** data diserahkan sebagai array ke
+   `renderLayout()` lalu di-`extract()` menjadi variabel View; View
+   menampilkannya dengan `<?= ?>`.
+4. **Front controller:** satu file `public/index.php` menerima semua
+   request dan memetakan `?page=` ke method Controller — pola yang sama
+   dengan routing Laravel.
+5. **Keuntungan pemisahan:** mengganti sumber data (mis. dari array ke
+   database) cukup mengubah Model; mengganti tampilan cukup mengubah View;
+   keduanya tidak mengganggu Controller.
 
-**Belum diuji:** tampilan dan responsivitas di browser sungguhan, serta hasil render CSS gaya shadcn (kompilasi CSS dan keberadaan class sudah diperiksa, tetapi tampilan visual belum dilihat). Tolong cek di lebar layar HP, tablet, dan desktop.
+## Pertanyaan Demo (Sprint 06)
 
-## Tahap berikutnya
+- *Apa fungsi Controller?* — Menerima request, mengatur proses, memanggil
+  Model, dan meneruskan data ke View (`GameController::index/show`).
+- *Data apa yang dikelola Model?* — Sepuluh listing akun game dan lima
+  penjual (dataset kanonis proyek) beserta method aksesnya.
+- *Apa yang ditampilkan View?* — Katalog, detail produk, dan halaman 404
+  dalam kerangka layout yang sama.
+- *Bagaimana Controller berkomunikasi dengan Model?* — Memanggil method
+  statis Model dan menerima objek `Game` sebagai hasil.
+- *Bagaimana data sampai ke View?* — Controller menyerahkan array data ke
+  `renderLayout()`; View membaca variabelnya dan mencetak dengan `<?= ?>`.
 
-Database (koneksi PDO di `config/` dan `includes/`, lalu ganti `games()`, `accounts()`, `articles()`, dan `topups()` di `functions.php` dengan query), autentikasi, halaman penjual untuk membuat listing, pembayaran dan pelacakan pesanan, serta migrasi ke Laravel (file `data/` menjadi migration dan seeder, `includes/` menjadi layout Blade).
+## Evolusi dari Week Sebelumnya (Week 6 → Week 7)
+
+| Berkas/Folder | Perubahan |
+|---------------|-----------|
+| `public/index.php` | **Baru.** Front controller + routing `?page=` sederhana. |
+| `app/Controllers/GameController.php` | **Baru.** Logika yang di Week 6 tersebar di kepala `index.php`/`detail.php` (baca `$_GET`, saring, tentukan 404) kini menjadi method Controller. |
+| `app/Models/Game.php` | Class Game Week 6 **dipindah** dari `classes/` dan ditambah method akses data statis: `all()`, `find()`, `filter()`, `related()`, `sellerCount()`. |
+| `app/Models/Seller.php`, `app/Models/Cart.php` | Class Week 6 **dipindah apa adanya** dari `classes/` (hanya komentar kepala disesuaikan). |
+| `app/Views/games/index.php`, `detail.php` | Badan halaman Week 6 dipotong menjadi View konten; logika pengambilan datanya dibuang — data datang dari Controller. Markup & class tidak berubah. |
+| `app/Views/layout.php` | **Baru.** Pengganti `includes/header.php` + `footer.php`: satu fungsi `renderLayout($judul, $kontenFile, $data)`. |
+| `app/Views/helpers.php` | Fungsi `formatRupiah()` + `renderKartuProduk()` dari `includes/functions.php` Week 6, dipindah khusus untuk View; tautan kartu kini `index.php?page=detail&id=...`. |
+| `data/products.php` | **Dihapus.** Isinya (dataset kanonis) pindah ke `Game::all()` di Model — nilai tidak berubah satu pun. |
+| `public/css/style.css` | **Salinan persis** file CSS yang sama sejak Week 2 (token desain tunggal tidak berubah di seluruh perjalanan). |
+| `public/assets/img/*` | Tidak berubah. |
+
+Hasilnya: enam week, satu tampilan, satu dataset — setiap week hanya
+mengubah **satu lapisan** (struktur → perilaku → sumber data → sisi server →
+objek → arsitektur), sehingga merge antar week tidak pernah bentrok.
