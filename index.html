@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TriverseStore — Marketplace Akun Game dengan Rekber</title>
+    <meta name="description" content="TriverseStore adalah marketplace akun game dengan sistem rekening bersama (rekber) agar transaksi aman.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <!-- ===== Header / Navigasi ===== -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="wordmark" href="index.html">Triverse<span class="accent">Store</span></a>
+            <nav class="main-nav">
+                <a href="index.html" class="active">Katalog</a>
+                <a href="#rekber">Cara Rekber</a>
+                <a href="#tentang">Tentang</a>
+            </nav>
+            <div class="header-actions">
+                <button class="btn btn-secondary btn-sm cart-button" id="cartToggle" type="button">
+                    Keranjang
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+                <a class="btn btn-primary btn-sm" href="#katalog">Jual Akun</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===== Hero ===== -->
+        <section class="hero">
+            <div class="container hero-grid">
+                <div>
+                    <h1>Akun game pilihan, transaksi aman pakai rekber.</h1>
+                    <p class="lead">TriverseStore mempertemukan pembeli dan penjual akun game terverifikasi. Dana diteruskan ke penjual hanya setelah akun berpindah tangan dengan aman.</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="#katalog">Lihat Katalog</a>
+                        <a class="btn btn-secondary" href="#rekber">Cara Kerja Rekber</a>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Listing Akun</div>
+                        <div class="stat-value">10</div>
+                        <div class="stat-note">akun aktif minggu ini</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Penjual</div>
+                        <div class="stat-value sage">5</div>
+                        <div class="stat-note">terverifikasi identitas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Transaksi Rekber</div>
+                        <div class="stat-value clay">12.480</div>
+                        <div class="stat-note">selesai tanpa sengketa</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Katalog (dirender JavaScript) ===== -->
+        <section class="section" id="katalog">
+            <div class="container">
+                <div class="section-head">
+                    <div>
+                        <h2>Katalog akun game</h2>
+                        <p>Semua akun melewati pemeriksaan kepemilikan oleh tim kami sebelum tampil di katalog.</p>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="search" id="searchInput" placeholder="Cari akun, game, atau kategori..." aria-label="Cari akun">
+                    </div>
+                    <div class="filter-group" role="group" aria-label="Filter kategori">
+                        <button class="filter-chip active" type="button" data-filter="Semua">Semua</button>
+                        <button class="filter-chip" type="button" data-filter="MOBA">MOBA</button>
+                        <button class="filter-chip" type="button" data-filter="RPG">RPG</button>
+                        <button class="filter-chip" type="button" data-filter="FPS">FPS</button>
+                        <button class="filter-chip" type="button" data-filter="Battle Royale">Battle Royale</button>
+                        <button class="filter-chip" type="button" data-filter="Aksi">Aksi</button>
+                        <button class="filter-chip" type="button" data-filter="Olahraga">Olahraga</button>
+                    </div>
+                </div>
+
+                <div class="game-grid" id="gameGrid"></div>
+
+                <div class="state-box" id="emptyState" hidden>
+                    <h3>Tidak ada akun yang cocok</h3>
+                    <p>Coba kata kunci lain atau pilih kategori "Semua".</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Keranjang + Form Pemesanan ===== -->
+        <section class="section" id="keranjang" style="padding-top: 0;">
+            <div class="container">
+                <div class="section-head">
+                    <div>
+                        <h2>Keranjang &amp; pemesanan</h2>
+                        <p>Akun yang kamu pilih masuk ke keranjang. Pembayaran selalu lewat rekber TriverseStore.</p>
+                    </div>
+                </div>
+
+                <div class="alert" id="orderAlert" role="status"></div>
+
+                <div class="split-grid">
+                    <div class="cart-panel">
+                        <h2>Keranjang belanja</h2>
+                        <div id="cartItems"></div>
+                        <div class="cart-total-row">
+                            <span class="total-label">Total pembayaran</span>
+                            <span class="total-value" id="cartTotal">Rp 0</span>
+                        </div>
+                        <button class="btn btn-primary btn-block" id="checkoutButton" type="button" style="margin-top: 1rem;" disabled>Bayar via Rekber</button>
+                    </div>
+
+                    <form class="form-card" id="orderForm" novalidate>
+                        <h2>Pesan langsung</h2>
+                        <p>Satu akun, tanpa keranjang. Isi data berikut dan kami kirimkan instruksi pembayaran rekber.</p>
+                        <div class="form-group">
+                            <label for="buyerName">Nama pembeli</label>
+                            <input type="text" id="buyerName" placeholder="Nama lengkap" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="buyerEmail">Email</label>
+                            <input type="email" id="buyerEmail" placeholder="nama@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productSelect">Pilih akun</label>
+                            <select id="productSelect"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentMethod">Metode pembayaran</label>
+                            <select id="paymentMethod">
+                                <option>Transfer Bank</option>
+                                <option>E-Wallet</option>
+                                <option>QRIS</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-sage btn-block" type="submit">Buat Pesanan Rekber</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Rekber ===== -->
+        <section class="section" id="rekber" style="padding-top: 0;">
+            <div class="container">
+                <div class="rekber-strip">
+                    <div class="rekber-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    </div>
+                    <div>
+                        <h2>Transaksi aman dengan rekening bersama</h2>
+                        <p>Pembayaranmu ditahan oleh TriverseStore dan baru diteruskan ke penjual setelah kamu mengonfirmasi akun diterima dan bisa diakses penuh.</p>
+                    </div>
+                    <div class="rekber-steps">
+                        <span class="rekber-step">Bayar ke TriverseStore</span>
+                        <span class="rekber-step">Dana ditahan sistem</span>
+                        <span class="rekber-step">Serah terima akun</span>
+                        <span class="rekber-step">Dana diteruskan</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Tentang ===== -->
+        <section class="section" id="tentang" style="padding-top: 0;">
+            <div class="container">
+                <div class="section-head">
+                    <div>
+                        <h2>Tentang TriverseStore</h2>
+                        <p>TriverseStore adalah proyek marketplace akun game yang dibangun bertahap selama satu semester mata kuliah Web Programming — mulai dari halaman HTML statis, lalu JavaScript, API, PHP prosedural, PHP OOP, hingga arsitektur MVC.</p>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Pemeriksaan Akun</div>
+                        <div class="stat-value">100%</div>
+                        <div class="stat-note">listing melewati cek kepemilikan</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Garansi Rekber</div>
+                        <div class="stat-value sage">24 jam</div>
+                        <div class="stat-note">masa konfirmasi serah terima</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Biaya Layanan</div>
+                        <div class="stat-value clay">5%</div>
+                        <div class="stat-note">dari nilai transaksi, transparan</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a class="wordmark" href="index.html">Triverse<span class="accent">Store</span></a>
+                    <p style="margin-top: 0.75rem;">Marketplace akun game dengan rekening bersama. Beli dan jual akun tanpa khawatir penipuan.</p>
+                </div>
+                <div>
+                    <h3>Marketplace</h3>
+                    <ul class="footer-links">
+                        <li><a href="#katalog">Katalog Akun</a></li>
+                        <li><a href="#rekber">Cara Rekber</a></li>
+                        <li><a href="#tentang">Tentang Kami</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Bantuan</h3>
+                    <ul class="footer-links">
+                        <li><a href="#rekber">Panduan Pembeli</a></li>
+                        <li><a href="#rekber">Panduan Penjual</a></li>
+                        <li><a href="#tentang">Hubungi Kami</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 TriverseStore — Tugas Kelompok Web Programming.</span>
+                <span>Week 3 · Sprint 02 — JavaScript: DOM &amp; Event</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
