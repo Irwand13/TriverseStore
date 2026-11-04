@@ -1,104 +1,93 @@
-# Triverse Store
+# Week 4 — Sprint 03: API & Fetch — From Interactive to Data-Driven
 
-Prototipe platform **top up game** dan **marketplace akun game**, dilengkapi katalog game dan artikel panduan.
-Dibuat dengan HTML5, CSS3, Tailwind CSS, PHP, dan sedikit JavaScript vanilla. Tampilan memakai **komponen gaya shadcn/ui lewat [Basecoat](https://basecoatui.com)** (versi HTML + Tailwind, tanpa React).
+**Penanggung jawab:** Alfino14 · **Branch acuan:** `week4`
 
-**Status:** semua data (game, listing, penjual, harga, artikel) adalah **data contoh** di file PHP. Belum ada database, login, pembayaran, atau integrasi API. Tidak ada tombol yang berpura-pura memproses transaksi.
+## Tema Sprint
 
-## Cara menjalankan
+Menghubungkan halaman ke API: aplikasi mengirim *request* ke endpoint →
+server memproses → *response* berisi data **JSON** → data ditampilkan
+dinamis di halaman. Di proyek ini endpoint disimulasikan secara lokal
+dengan file `api/games.json` (pola REST yang sama: satu endpoint
+mengembalikan satu object berisi `products` berupa array of objects).
 
-Butuh PHP 8.0 atau lebih baru, dan koneksi internet (untuk Tailwind dan font, lihat bagian keterbatasan).
+## Pemetaan Sub-Tugas
 
-**Terminal:**
-```bash
-cd TriverseStore
+| Kode | Sub-Tugas | Penerapan di folder ini |
+|------|-----------|-------------------------|
+| W4.1 | Koneksi API Pertama (Fetch & Promise) | `assets/js/app.js` fungsi `loadProducts()`: `fetch("api/games.json")` ditangani dengan `async/await` + `try/catch/finally`; blok komentar di kepala file membandingkan pola `.then()` berantai dari slide. Pemeriksaan `response.ok` melempar `Error` bila respons gagal. |
+| W4.2 | Render Data JSON ke DOM | Array of objects dirender dengan `map()` + template literal menjadi kartu katalog (markup identik Week 2–3); satu object tunggal (produk unggulan P1) dirender ke halaman `detail.html` oleh `assets/js/detail.js` dengan mengakses properti `data.judul`, `data.harga`, dst. |
+| W4.3 | Loading State & Error Handling | Kotak "Mengambil data..." + spinner tampil selama request; bila gagal, kotak error berisi pesan + tombol **Coba Lagi**; tombol **Simulasikan Error API** sengaja meminta endpoint yang tidak ada agar penanganan error dapat didemonstrasikan. |
+| W4.4 | Demo Data Flow & Checklist Sprint 03 | Lihat pertanyaan demo di bawah. |
+
+## Struktur Folder
+
+```
+week4/
+├── index.html            # Sama seperti Week 3 + kotak loading/error di katalog
+├── detail.html           # Diisi dari satu object JSON (P1) lewat fetch
+├── api/
+│   └── games.json        # Simulasi REST API: dataset kanonis format JSON
+├── assets/
+│   ├── css/style.css     # Identik dengan Week 3 (tanpa perubahan)
+│   ├── img/              # Sama persis dengan week sebelumnya
+│   └── js/
+│       ├── app.js        # Fetch + seluruh interaksi Week 3
+│       └── detail.js     # Fetch + render detail satu produk
+└── README.md
+```
+
+`assets/js/data.js` dari Week 3 **dihapus** — data tidak lagi menempel di
+kode, melainkan diambil dari API. Inilah satu-satunya perubahan konseptual
+week ini; semua markup, CSS, dan perilaku interaksi tetap sama.
+
+## Cara Menjalankan
+
+`fetch()` tidak bekerja dari `file://`, jadi jalankan lewat server lokal
+dari folder `week4/`:
+
+```bat
 php -S localhost:8000
 ```
-Buka http://localhost:8000/index.php
 
-**XAMPP / Laragon:** taruh folder di `htdocs` (XAMPP) atau `www` (Laragon), jalankan Apache, lalu buka `http://localhost/TriverseStore/`.
+Lalu buka `http://localhost:8000`. (Alternatif: ekstensi Live Server di
+VS Code.) Bila dibuka langsung sebagai file, halaman menampilkan kotak
+error yang menjelaskan hal ini — itu memang perilaku error handling-nya.
 
-Live Server di VS Code tidak bisa menjalankan PHP.
+## Poin Penjelasan untuk Dosen
 
-## Halaman
+1. **Alur data:** request → response JSON → `response.json()` → object
+   JavaScript → render ke DOM. Arah sebaliknya tidak ada: halaman tidak
+   pernah mengubah file JSON.
+2. **Dua cara menangani Promise:** `.then()` berantai (di komentar) vs
+   `async/await` (dipakai) — hasil akhirnya sama, keterbacaan berbeda.
+3. **Tiga state antarmuka:** *loading* (indikator tampil), *success* (data
+   dirender), *error* (pesan + jalan keluar berupa tombol coba lagi). State
+   dikelola dengan atribut `hidden` dan `finally` memastikan indikator
+   loading selalu berhenti.
+4. **Render massal:** `products.map(buildCardHTML).join("")` membangun
+   seluruh kartu sebagai string lalu sekali di-assign ke `innerHTML` —
+   setara pola `forEach` + template literal di slide.
 
-| File | Fungsi |
-|---|---|
-| `index.php` | Beranda: pengantar, game unggulan, top up, listing terbaru, kategori, berita |
-| `topup.php` | Daftar game yang bisa di-top up, dengan harga terendah |
-| `topup-game.php` | `?id=<slug>`: pilih nominal, isi ID game (dan server), lalu tinjau pesanan. Form POST divalidasi di PHP dan berakhir di pratinjau |
-| `marketplace.php` | Listing akun dengan filter: pencarian, game, kategori, rentang harga, urutan |
-| `account-detail.php` | `?id=<slug>`: detail listing, isi akun, status, catatan privasi |
-| `catalog.php` | Katalog game dengan pencarian dan filter kategori |
-| `game-detail.php` | `?id=<slug>`: detail game dan game terkait |
-| `news.php`, `news-detail.php` | Daftar dan isi artikel contoh |
+## Pertanyaan Demo (Sprint 03)
 
-## Struktur
+- *API apa yang digunakan?* — Endpoint REST lokal `api/games.json` yang
+  mengembalikan object berisi array `products`.
+- *Data apa yang diambil?* — Sepuluh produk akun game beserta penjual,
+  harga, diskon, dan statusnya.
+- *Bagaimana data diproses?* — Difilter (pencarian/kategori) di JavaScript,
+  lalu dirender menjadi kartu HTML.
+- *Apa yang terjadi ketika request gagal?* — Loading berhenti, kotak error
+  tampil berisi penyebab dan tombol "Coba Lagi" (dapat ditunjukkan dengan
+  tombol "Simulasikan Error API").
 
-```
-includes/   head.php, navbar.php, footer.php, game-card.php, account-card.php, not-found.php, functions.php
-data/       games.php, accounts.php, topup.php, news.php   data contoh, terpisah dari template
-config/     app.php                                       nama dan tagline situs
-assets/     css/input.css (sumber), css/style.css (tema), css/app.css (hasil build), js/app.js, images/
-package.json  hanya untuk build CSS
-```
+## Evolusi dari Week Sebelumnya (Week 3 → Week 4)
 
-`includes/functions.php` berisi semua fungsi bantu: `e()` (pembungkus `htmlspecialchars`), pemuat data, validasi slug, pencarian, validasi form top up, dan generator sampul. Halaman hanya berisi markup dan sedikit logika.
-
-## Tentang data contoh
-
-- **Gambar:** belum ada artwork resmi, jadi tiap game punya ilustrasi SVG buatan sendiri (kristal untuk MOBA, pulau dan parasut untuk battle royale, pulau melayang untuk RPG dunia terbuka, dan seterusnya) yang digambar oleh `art_scene()` di `includes/functions.php`. Ada tiga bentuk: `portrait` (kartu), `wide` (artikel, ubin kategori), dan `banner` (hero dan header halaman detail).
-- **Game:** memakai nama game populer di Indonesia supaya alurnya terasa nyata. Nama game milik masing-masing penerbit, dan situs ini tidak berafiliasi dengan mereka. Sampul adalah ilustrasi buatan, **bukan artwork resmi**.
-- **Harga dan nominal top up** di `data/topup.php` hanya contoh, bukan harga resmi. **Format ID** (panjang digit, Zone ID, pilihan server) adalah perkiraan; cek ke dokumentasi penyedia top up sebelum dipakai sungguhan.
-- **Listing akun, penjual, dan artikel** sepenuhnya fiktif. Tanggal hanya penanda. Tidak ada rating, jumlah pengguna, atau statistik karangan.
-- **Kredensial login tidak ada di data** dan tidak pernah ditampilkan. Halaman listing menyatakan bahwa serah terima akun dan penanganan sengketa akan dirancang bersama sistem pesanan, dan bahwa aturan penerbit soal pemindahan akun bisa berbeda.
-
-Untuk memakai gambar sendiri (misalnya poster yang kamu punya izin memakainya), taruh file di `assets/images/` dan tambahkan `'image' => 'nama.jpg'` pada data game. Gambar itu akan dipakai di semua tempat sampul tampil; ilustrasi SVG hanya jadi cadangan. Jika file tidak ada, sampul SVG dipakai.
-
-## Desain
-
-Konsep: katalog dan etalase, bukan halaman promosi. Tata letak rata kiri, garis tipis, dan daftar berbentuk indeks. Latar teal gelap dengan satu warna aksen (kuning marigold) untuk tombol utama, menu aktif, dan sorotan. Font: Chakra Petch (judul) dan Figtree (isi). Token warna ada di `assets/css/style.css`.
-
-## Keamanan dasar
-
-- Semua output dinamis lewat `e()`.
-- Parameter `id`, `q`, `category`, `game`, `min`, `max`, `sort` divalidasi: slug hanya `[a-z0-9-]`, kategori dan game harus ada di data, angka harus bilangan bulat, teks dipangkas dan dibatasi panjangnya, nilai non-teks (array) diabaikan.
-- Form top up mengecek nominal terhadap daftar milik game itu sendiri, sehingga nilai yang diubah-ubah ditolak. Data yang diisi tidak disimpan.
-- ID tidak dikenal menghasilkan halaman 404 yang sebenarnya.
-
-## UI: shadcn/ui lewat Basecoat
-
-shadcn/ui asli adalah komponen React, sehingga tidak bisa dipakai di proyek ini. **Basecoat** (`basecoat-css`) adalah implementasi shadcn/ui untuk HTML biasa + Tailwind: token tema sama (`--primary`, `--border`, `--ring`, ...) dan markup semantik. Yang dipakai: `btn`, `card`, `badge`, `alert`, `breadcrumb`, `field`, `input`, `select`, dan radio. Tidak ada JavaScript Basecoat yang dimuat.
-
-Tema ada di `assets/css/style.css` (blok `.dark`): `--primary` kuning marigold, `--background` teal gelap. Situs selalu gelap (`<html class="dark">`).
-
-Contoh markup (lihat `includes/functions.php` untuk helper `breadcrumb()`, `ui_alert()`, `status_badge()`):
-```html
-<a class="btn" href="#">Utama</a>
-<a class="btn" data-variant="outline" data-size="sm" href="#">Garis tepi</a>
-<span class="badge" data-variant="secondary">Dipesan</span>
-<div class="field"><label for="x">Label</label><input id="x" class="input"></div>
-```
-
-## CSS: dikompilasi, bukan CDN
-
-`assets/css/app.css` adalah hasil build Tailwind v4 + Basecoat dan **sudah disertakan**, jadi situs langsung jalan tanpa Node. Node hanya dibutuhkan jika kamu mengubah gaya atau menambah class Tailwind baru:
-
-```bash
-npm install            # sekali saja
-npm run build:css      # bangun ulang assets/css/app.css
-npm run watch:css      # bangun ulang otomatis saat file berubah
-```
-Edit `assets/css/style.css` (tema dan gaya khusus) atau template PHP, **jangan** edit `app.css` langsung. Node hanya alat build CSS, bukan backend aplikasi.
-
-Yang masih dari internet: font Google (Chakra Petch dan Figtree), yang jatuh ke font sistem jika gagal dimuat.
-
-## Yang sudah diuji
-
-Dengan PHP 8.3 CLI dan server bawaannya: sintaks semua file PHP; status HTTP semua halaman; pencarian dan filter katalog dan marketplace (termasuk min/max yang tertukar, urutan harga, dan parameter sampah atau array); ID tidak valid menghasilkan 404 (termasuk `../`); form top up dengan input valid dan tidak valid untuk game dengan Zone ID, dengan pilihan server, dan tanpa server; nominal yang diubah-ubah; escape payload `<script>`; nilai form tetap setelah error; tidak ada warning PHP; semua tautan dan aset lokal bisa dibuka; tidak ada sisa teks antarmuka berbahasa Inggris.
-
-**Belum diuji:** tampilan dan responsivitas di browser sungguhan, serta hasil render CSS gaya shadcn (kompilasi CSS dan keberadaan class sudah diperiksa, tetapi tampilan visual belum dilihat). Tolong cek di lebar layar HP, tablet, dan desktop.
-
-## Tahap berikutnya
-
-Database (koneksi PDO di `config/` dan `includes/`, lalu ganti `games()`, `accounts()`, `articles()`, dan `topups()` di `functions.php` dengan query), autentikasi, halaman penjual untuk membuat listing, pembayaran dan pelacakan pesanan, serta migrasi ke Laravel (file `data/` menjadi migration dan seeder, `includes/` menjadi layout Blade).
+| Berkas | Perubahan |
+|--------|-----------|
+| `api/games.json` | **Baru.** Dataset kanonis yang sama, kini sebagai respons API (JSON). |
+| `assets/js/data.js` | **Dihapus.** Data tidak lagi didefinisikan di JavaScript. |
+| `assets/js/app.js` | Diubah: sumber data diganti `loadProducts()` (fetch + async/await + loading/error); seluruh fungsi render/keranjang/form dipertahankan apa adanya. |
+| `assets/js/detail.js` | Ditulis ulang: detail produk kini diambil dengan fetch dan dirender dari satu object JSON; logika keranjang bersama tetap. |
+| `index.html` | Diubah kecil: ditambah kotak loading `#loadingState`, kotak error `#errorState`, tombol "Simulasikan Error API", dan tag `data.js` dihapus. |
+| `detail.html` | Diubah: bidang-bidang detail diberi `id` dan dikosongkan — isinya datang dari API; ditambah state loading/error untuk detail. |
+| `assets/css/style.css`, `assets/img/*` | **Tidak berubah sama sekali** (spinner & kotak state sudah tersedia di sistem desain sejak Week 2). |
