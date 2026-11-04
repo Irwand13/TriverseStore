@@ -1,84 +1,118 @@
-# Week 3 — Sprint 02: JavaScript — From Static to Interactive
+# Week 7 — Sprint 06: MVC — From OOP to MVC
 
-**Penanggung jawab:** Irwand13 (Irwand) · **Branch acuan:** `week3`
+**Penanggung jawab:** Alfino14 · **Branch acuan:** `week7`
 
 ## Tema Sprint
 
-Menambahkan JavaScript pada halaman Week 2 agar merespons aksi pengguna:
-aksi pengguna → **event** → JavaScript menjalankan kode → **manipulasi DOM**
-→ tampilan berubah tanpa memuat ulang halaman.
+Mengorganisasi aplikasi PHP OOP Week 6 ke arsitektur **MVC**: tanggung
+jawab dipisah menjadi **Model** (data), **View** (tampilan), dan
+**Controller** (pengatur alur). Alur request-nya:
+
+```
+User → request → Controller → meminta data ke Model → Model mengembalikan
+data → Controller meneruskan ke View → View menghasilkan HTML → User
+```
+
+Hasil akhir di layar **identik** dengan Week 6 — yang berubah hanya
+organisasi kodenya. Week ini adalah jembatan langsung ke Laravel (framework
+MVC) yang dipakai proyek TriverseStore sebenarnya.
 
 ## Pemetaan Sub-Tugas
 
 | Kode | Sub-Tugas | Penerapan di folder ini |
 |------|-----------|-------------------------|
-| W3.1 | Selector & Manipulasi DOM | `assets/js/app.js` memakai `querySelector` (id `#searchInput`, `#gameGrid`), `querySelectorAll` (class `.filter-chip`), lalu mengisi katalog dengan `innerHTML` dari template literal; teks harga/total diubah dengan `textContent`. |
-| W3.2 | Event Handling (Click, Input, Submit) | Event `input` pada kotak pencarian (filter langsung), `click` pada chip kategori & tombol keranjang, `submit` pada form pemesanan — semua dengan `addEventListener`. |
-| W3.3 | Satu Interaksi Utuh (Task 03) | Keranjang belanja utuh: klik "+ Keranjang" → item tersimpan → badge header, panel keranjang, dan total berubah → checkout menampilkan ringkasan rekber. Termasuk `setAttribute`-style lewat `dataset`, `classList.add/remove` pada chip aktif, dan perubahan `hidden` pada state kosong. |
-| W3.4 | Demo & Review Sprint 02 | Lihat pertanyaan demo di bawah; interaksi terlihat langsung, tidak mengganggu UI, dan halaman lama tetap utuh. |
+| W7.1 | Desain Struktur MVC | Folder `app/Models`, `app/Views`, `app/Controllers` memisahkan tiga tanggung jawab; `public/` menjadi satu-satunya folder yang diekspos server (front controller + aset). |
+| W7.2 | Bangun Model & Controller | Model `Game` (typed property + method akses data statis `all()`, `find()`, `filter()`, `related()`), Model `Seller` & `Cart`; `GameController` dengan method `index()`, `show()`, `process()`, `notFound()`. |
+| W7.3 | Bangun View & Hubungkan Alur Penuh | View di `app/Views/games/` menampilkan data dari Controller dengan short echo `<?= ?>`; View tidak pernah mengambil data sendiri. Alur request → Controller → Model → View berjalan untuk katalog, detail, dan 404. |
+| W7.4 | Demo MVC Flow & Review Sprint 06 | Lihat pertanyaan demo di bawah. |
 
 ## Struktur Folder
 
 ```
-week3/
-├── index.html            # Sama seperti Week 2; katalog kini dirender JS
-├── detail.html           # Sama seperti Week 2 + tombol "Tambah ke Keranjang"
-├── assets/
-│   ├── css/style.css     # File Week 2 + delta kecil (kelas .split-grid)
-│   ├── img/              # Sama persis dengan Week 2
-│   └── js/
-│       ├── data.js       # Dataset kanonis sebagai array of objects
-│       ├── app.js        # Render katalog, pencarian, filter, keranjang, form
-│       └── detail.js     # Interaksi halaman detail (keranjang bersama)
+week7/
+├── public/
+│   ├── index.php         # FRONT CONTROLLER: satu-satunya pintu masuk (?page=)
+│   ├── css/style.css     # Salinan file CSS yang sama sejak Week 2
+│   └── assets/img/       # Gambar yang sama persis dengan week sebelumnya
+├── app/
+│   ├── Models/
+│   │   ├── Game.php      # Class Week 6 + method akses data (all/find/filter/related)
+│   │   ├── Seller.php    # Class Week 6, kini berperan sebagai Model
+│   │   └── Cart.php      # Class Week 6, kini berperan sebagai Model
+│   ├── Controllers/
+│   │   └── GameController.php   # index(), show(), process(), notFound()
+│   └── Views/
+│       ├── layout.php    # Kerangka HTML + renderLayout() (head/header/footer)
+│       ├── helpers.php   # formatRupiah() + renderKartuProduk() untuk View
+│       ├── games/
+│       │   ├── index.php # View katalog
+│       │   └── detail.php# View detail produk
+│       └── errors/
+│           └── 404.php   # View tidak ditemukan
 └── README.md
 ```
 
+Tidak ada folder `includes/` atau `data/` lagi: partial header/footer
+menjadi `layout.php`, dan file data menjadi tanggung jawab Model.
+
 ## Cara Menjalankan
 
-Buka `index.html` dengan browser (klik dua kali). JavaScript murni tanpa
-library/framework. Keranjang disimpan di `localStorage` (kunci `ts_cart`)
-sehingga isinya sama antara halaman katalog dan detail.
+Document root diarahkan ke `public/`:
 
-Catatan materi Tailwind (slide 8): proyek ini **sengaja tetap memakai CSS
-kustom** agar sistem desainnya konsisten dari Week 2 sampai Week 7; Tailwind
-dibahas sebagai perbandingan gaya penulisan (utility class) pada saat demo.
+```bat
+php -S localhost:8000 -t public
+```
+
+(dari folder `week7/`), lalu buka `http://localhost:8000`.
+Rute: katalog = `index.php`, detail = `index.php?page=detail&id=P1`,
+rute tak dikenal = 404. PHP 8.2, tanpa database/framework.
 
 ## Poin Penjelasan untuk Dosen
 
-1. **Selector:** `querySelector` mengambil satu elemen (id/class/tag),
-   `querySelectorAll` mengambil banyak elemen sekaligus — persis tiga pola
-   selector di slide.
-2. **Render dari data:** katalog tidak lagi ditulis manual di HTML; fungsi
-   `buildCardHTML()` membangun markup kartu yang *sama persis* dengan Week 2
-   dari array `PRODUCTS`, lalu `container.innerHTML` menampilkannya sekaligus.
-3. **Event:** perbedaan `click` (aksi tombol), `input` (setiap ketikan), dan
-   `submit` (pengiriman form, dicegah reload-nya dengan `preventDefault()`).
-4. **State di sisi klien:** array `cart` adalah sumber kebenaran keranjang;
-   setiap perubahan memanggil `renderCart()` agar badge, daftar, dan total
-   selalu sinkron.
+1. **Fungsi tiap komponen:** Model mengelola data (dataset + cara
+   mengambilnya), Controller mengatur proses (membaca parameter request,
+   memutuskan View mana dan data apa), View hanya menampilkan.
+2. **Komunikasi Controller ↔ Model:** Controller memanggil method Model
+   (`Game::filter(...)`, `Game::find(...)`) dan menerima objek kembali —
+   Controller tidak tahu (dan tidak peduli) dari mana data berasal.
+3. **Komunikasi Controller → View:** data diserahkan sebagai array ke
+   `renderLayout()` lalu di-`extract()` menjadi variabel View; View
+   menampilkannya dengan `<?= ?>`.
+4. **Front controller:** satu file `public/index.php` menerima semua
+   request dan memetakan `?page=` ke method Controller — pola yang sama
+   dengan routing Laravel.
+5. **Keuntungan pemisahan:** mengganti sumber data (mis. dari array ke
+   database) cukup mengubah Model; mengganti tampilan cukup mengubah View;
+   keduanya tidak mengganggu Controller.
 
-## Pertanyaan Demo (Sprint 02)
+## Pertanyaan Demo (Sprint 06)
 
-- *Interaksi apa yang ditunjukkan?* — Pencarian & filter katalog, tambah/
-  hapus keranjang dengan total otomatis, dan form pemesanan dengan pesan hasil.
-- *Event apa yang digunakan?* — `click`, `input`, dan `submit`.
-- *Apa yang dilakukan JavaScript?* — Memfilter array data, membangun ulang
-  HTML katalog, dan memperbarui panel keranjang.
-- *Elemen apa yang berubah?* — `#gameGrid`, `#cartItems`, `#cartTotal`,
-  `#cartCount`, dan kotak pesan `#orderAlert`.
+- *Apa fungsi Controller?* — Menerima request, mengatur proses, memanggil
+  Model, dan meneruskan data ke View (`GameController::index/show`).
+- *Data apa yang dikelola Model?* — Sepuluh listing akun game dan lima
+  penjual (dataset kanonis proyek) beserta method aksesnya.
+- *Apa yang ditampilkan View?* — Katalog, detail produk, dan halaman 404
+  dalam kerangka layout yang sama.
+- *Bagaimana Controller berkomunikasi dengan Model?* — Memanggil method
+  statis Model dan menerima objek `Game` sebagai hasil.
+- *Bagaimana data sampai ke View?* — Controller menyerahkan array data ke
+  `renderLayout()`; View membaca variabelnya dan mencetak dengan `<?= ?>`.
 
-## Evolusi dari Week Sebelumnya (Week 2 → Week 3)
+## Evolusi dari Week Sebelumnya (Week 6 → Week 7)
 
-| Berkas | Perubahan |
-|--------|-----------|
-| `index.html` | Diubah: kartu katalog statis dihapus → diganti toolbar (pencarian + chip kategori) dan container kosong `#gameGrid`; ditambah tombol Keranjang di header dan section "Keranjang & Pemesanan" (panel keranjang + form). Hero, strip rekber, tentang, dan footer **tidak berubah**. |
-| `detail.html` | Diubah kecil: tombol Keranjang di header, kotak pesan `#detailAlert`, tombol "Tambah ke Keranjang" di panel beli, dan tag `<script>`. Sisanya identik. |
-| `assets/css/style.css` | Disalin utuh dari Week 2, ditambah satu blok kecil di akhir: kelas `.split-grid` untuk layout dua kolom keranjang/form. Tidak ada token warna/font yang berubah. |
-| `assets/js/data.js` | **Baru.** Dataset kanonis yang di Week 2 tersebar sebagai HTML statis kini ditulis sekali sebagai array of objects. |
-| `assets/js/app.js` | **Baru.** Seluruh lapisan interaksi halaman katalog. |
-| `assets/js/detail.js` | **Baru.** Interaksi halaman detail. |
-| `assets/img/*` | Tidak berubah sama sekali. |
+| Berkas/Folder | Perubahan |
+|---------------|-----------|
+| `public/index.php` | **Baru.** Front controller + routing `?page=` sederhana. |
+| `app/Controllers/GameController.php` | **Baru.** Logika yang di Week 6 tersebar di kepala `index.php`/`detail.php` (baca `$_GET`, saring, tentukan 404) kini menjadi method Controller. |
+| `app/Models/Game.php` | Class Game Week 6 **dipindah** dari `classes/` dan ditambah method akses data statis: `all()`, `find()`, `filter()`, `related()`, `sellerCount()`. |
+| `app/Models/Seller.php`, `app/Models/Cart.php` | Class Week 6 **dipindah apa adanya** dari `classes/` (hanya komentar kepala disesuaikan). |
+| `app/Views/games/index.php`, `detail.php` | Badan halaman Week 6 dipotong menjadi View konten; logika pengambilan datanya dibuang — data datang dari Controller. Markup & class tidak berubah. |
+| `app/Views/layout.php` | **Baru.** Pengganti `includes/header.php` + `footer.php`: satu fungsi `renderLayout($judul, $kontenFile, $data)`. |
+| `app/Views/helpers.php` | Fungsi `formatRupiah()` + `renderKartuProduk()` dari `includes/functions.php` Week 6, dipindah khusus untuk View; tautan kartu kini `index.php?page=detail&id=...`. |
+| `data/products.php` | **Dihapus.** Isinya (dataset kanonis) pindah ke `Game::all()` di Model — nilai tidak berubah satu pun. |
+| `public/css/style.css` | **Salinan persis** file CSS yang sama sejak Week 2 (token desain tunggal tidak berubah di seluruh perjalanan). |
+| `public/assets/img/*` | Tidak berubah. |
 
-Karena markup kartu yang dihasilkan JavaScript identik dengan markup statis
-Week 2, menggabungkan (merge) Week 3 ke Week 2 tidak menimbulkan konflik
-tampilan — yang bertambah murni lapisan perilaku.
+Hasilnya: enam week, satu tampilan, satu dataset — setiap week hanya
+mengubah **satu lapisan** (struktur → perilaku → sumber data → sisi server →
+objek → arsitektur), sehingga merge antar week tidak pernah bentrok.
