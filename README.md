@@ -1,104 +1,91 @@
-# Triverse Store
+# Week 5 — Sprint 04: PHP Dasar — From Client-Side to Server-Side
 
-Prototipe platform **top up game** dan **marketplace akun game**, dilengkapi katalog game dan artikel panduan.
-Dibuat dengan HTML5, CSS3, Tailwind CSS, PHP, dan sedikit JavaScript vanilla. Tampilan memakai **komponen gaya shadcn/ui lewat [Basecoat](https://basecoatui.com)** (versi HTML + Tailwind, tanpa React).
+**Penanggung jawab:** nurdiansyah-io · **Branch acuan:** `week5`
 
-**Status:** semua data (game, listing, penjual, harga, artikel) adalah **data contoh** di file PHP. Belum ada database, login, pembayaran, atau integrasi API. Tidak ada tombol yang berpura-pura memproses transaksi.
+## Tema Sprint
 
-## Cara menjalankan
+Logika halaman berpindah dari browser ke **server**: user membuka halaman →
+browser mengirim *request* → web server menjalankan script PHP → hasil
+proses dikirim kembali sebagai **HTML response**. Program PHP prosedural
+mengikuti alur Input → Process → Output dengan delapan topik dasar: syntax,
+variable, datatype, operator, conditional, loop, function, output.
 
-Butuh PHP 8.0 atau lebih baru, dan koneksi internet (untuk Tailwind dan font, lihat bagian keterbatasan).
+## Pemetaan Sub-Tugas
 
-**Terminal:**
-```bash
-cd TriverseStore
+| Kode | Sub-Tugas | Penerapan di folder ini |
+|------|-----------|-------------------------|
+| W5.1 | Setup PHP & Halaman PHP Pertama | `index.php` dan `detail.php` adalah halaman `.php` yang dijalankan server lokal (`php -S`); seluruh output-nya adalah HTML hasil proses PHP. |
+| W5.2 | Variable & Conditional | Variable `$kategoriAktif` dan `$kataKunci` dibaca dari `$_GET`; conditional `if/else` menentukan badge status, harga coret, tombol beli vs "Sudah Terjual", dan cabang halaman 404. |
+| W5.3 | Loop & Function | `foreach` menyaring dan merender katalog dari array; function berparameter dengan `return` di `includes/functions.php`: `formatRupiah()`, `hargaCoret()`, `badgeClass()`, dan `renderKartuProduk()`. |
+| W5.4 | Konten Dinamis Server-Side & Demo Sprint 04 | Seluruh katalog, filter, dan halaman detail dihasilkan server dari `data/products.php` — tidak ada lagi JavaScript untuk data. |
+
+## Struktur Folder
+
+```
+week5/
+├── index.php             # Katalog + filter GET (kategori & pencarian)
+├── detail.php            # Detail produk ?id=P1; 404 bila id tidak ada
+├── data/
+│   └── products.php      # Dataset kanonis sebagai array PHP + cariProduk()
+├── includes/
+│   ├── functions.php     # formatRupiah, hargaCoret, badgeClass, render kartu
+│   ├── header.php        # Partial kepala halaman (dipakai bersama)
+│   └── footer.php        # Partial kaki halaman (dipakai bersama)
+├── assets/
+│   ├── css/style.css     # Identik dengan Week 4 (tanpa perubahan)
+│   └── img/              # Sama persis dengan week sebelumnya
+└── README.md
+```
+
+## Cara Menjalankan
+
+Dari folder `week5/`:
+
+```bat
 php -S localhost:8000
 ```
-Buka http://localhost:8000/index.php
 
-**XAMPP / Laragon:** taruh folder di `htdocs` (XAMPP) atau `www` (Laragon), jalankan Apache, lalu buka `http://localhost/TriverseStore/`.
+Buka `http://localhost:8000`. Membutuhkan PHP 8.2 (sesuai laptop
+pengembangan). Tanpa database dan tanpa framework — PHP murni.
 
-Live Server di VS Code tidak bisa menjalankan PHP.
+## Poin Penjelasan untuk Dosen
 
-## Halaman
+1. **Perbedaan client-side vs server-side:** di Week 3–4 browser mengunduh
+   data lalu JavaScript menyaringnya; di Week 5 penyaringan terjadi di
+   server — HTML yang tiba di browser sudah berisi hasil filter saja.
+   Buktinya terlihat di URL: `index.php?kategori=RPG&q=akun`.
+2. **Variable & tipe data:** string (`$judul`), integer (`$harga`), float
+   (`$rating`), array (`$products`), dan null (`hargaCoret()` mengembalikan
+   `null` bila tidak ada diskon).
+3. **Conditional & operator:** perbandingan ketat `===` pada status dan
+   kategori, `if/elseif` lewat `match` pada `badgeClass()`.
+4. **Function:** `formatRupiah(850000)` mengembalikan `"Rp 850.000"` —
+   logika yang sama dipakai katalog, detail, dan panel beli tanpa duplikasi.
+5. **Output:** `echo` dan tag pendek `<?= ... ?>` menyisipkan hasil proses
+   PHP ke dalam HTML; `htmlspecialchars()` menjaga output teks tetap aman.
 
-| File | Fungsi |
-|---|---|
-| `index.php` | Beranda: pengantar, game unggulan, top up, listing terbaru, kategori, berita |
-| `topup.php` | Daftar game yang bisa di-top up, dengan harga terendah |
-| `topup-game.php` | `?id=<slug>`: pilih nominal, isi ID game (dan server), lalu tinjau pesanan. Form POST divalidasi di PHP dan berakhir di pratinjau |
-| `marketplace.php` | Listing akun dengan filter: pencarian, game, kategori, rentang harga, urutan |
-| `account-detail.php` | `?id=<slug>`: detail listing, isi akun, status, catatan privasi |
-| `catalog.php` | Katalog game dengan pencarian dan filter kategori |
-| `game-detail.php` | `?id=<slug>`: detail game dan game terkait |
-| `news.php`, `news-detail.php` | Daftar dan isi artikel contoh |
+## Pertanyaan Demo (Sprint 04)
 
-## Struktur
+- *Bagaimana conditional/loop digunakan?* — Conditional menyaring produk
+  dan menentukan label status; loop `foreach` merender setiap produk hasil
+  saringan menjadi kartu.
+- *Apa yang dihasilkan PHP?* — Dokumen HTML lengkap (katalog dan detail)
+  yang datanya berasal dari array di server.
+- *Perbedaan proses PHP dengan JavaScript?* — PHP berjalan sekali di
+  server sebelum halaman dikirim; JavaScript berjalan di browser setelah
+  halaman diterima.
 
-```
-includes/   head.php, navbar.php, footer.php, game-card.php, account-card.php, not-found.php, functions.php
-data/       games.php, accounts.php, topup.php, news.php   data contoh, terpisah dari template
-config/     app.php                                       nama dan tagline situs
-assets/     css/input.css (sumber), css/style.css (tema), css/app.css (hasil build), js/app.js, images/
-package.json  hanya untuk build CSS
-```
+## Evolusi dari Week Sebelumnya (Week 4 → Week 5)
 
-`includes/functions.php` berisi semua fungsi bantu: `e()` (pembungkus `htmlspecialchars`), pemuat data, validasi slug, pencarian, validasi form top up, dan generator sampul. Halaman hanya berisi markup dan sedikit logika.
+| Berkas | Perubahan |
+|--------|-----------|
+| `index.php`, `detail.php` | **Baru** (pengganti `index.html`/`detail.html`): markup, class, dan teks **identik** dengan Week 4, tetapi kini dihasilkan PHP di server. Detail tidak lagi mencontohkan P1 saja — semua produk punya halaman detail lewat `?id=`. |
+| `data/products.php` | **Baru.** Dataset kanonis yang di Week 4 berbentuk `games.json` kini menjadi array PHP. |
+| `includes/functions.php` | **Baru.** Padanan server-side dari helper JavaScript Week 3–4 (`formatRupiah`, dsb.) plus `renderKartuProduk()`. |
+| `includes/header.php`, `includes/footer.php` | **Baru.** Header/footer yang sebelumnya disalin di tiap HTML kini satu partial bersama. |
+| `api/games.json`, `assets/js/*` | **Dihapus.** Tidak ada lagi fetch maupun JavaScript untuk data. |
+| `assets/css/style.css`, `assets/img/*` | **Tidak berubah sama sekali.** |
 
-## Tentang data contoh
-
-- **Gambar:** belum ada artwork resmi, jadi tiap game punya ilustrasi SVG buatan sendiri (kristal untuk MOBA, pulau dan parasut untuk battle royale, pulau melayang untuk RPG dunia terbuka, dan seterusnya) yang digambar oleh `art_scene()` di `includes/functions.php`. Ada tiga bentuk: `portrait` (kartu), `wide` (artikel, ubin kategori), dan `banner` (hero dan header halaman detail).
-- **Game:** memakai nama game populer di Indonesia supaya alurnya terasa nyata. Nama game milik masing-masing penerbit, dan situs ini tidak berafiliasi dengan mereka. Sampul adalah ilustrasi buatan, **bukan artwork resmi**.
-- **Harga dan nominal top up** di `data/topup.php` hanya contoh, bukan harga resmi. **Format ID** (panjang digit, Zone ID, pilihan server) adalah perkiraan; cek ke dokumentasi penyedia top up sebelum dipakai sungguhan.
-- **Listing akun, penjual, dan artikel** sepenuhnya fiktif. Tanggal hanya penanda. Tidak ada rating, jumlah pengguna, atau statistik karangan.
-- **Kredensial login tidak ada di data** dan tidak pernah ditampilkan. Halaman listing menyatakan bahwa serah terima akun dan penanganan sengketa akan dirancang bersama sistem pesanan, dan bahwa aturan penerbit soal pemindahan akun bisa berbeda.
-
-Untuk memakai gambar sendiri (misalnya poster yang kamu punya izin memakainya), taruh file di `assets/images/` dan tambahkan `'image' => 'nama.jpg'` pada data game. Gambar itu akan dipakai di semua tempat sampul tampil; ilustrasi SVG hanya jadi cadangan. Jika file tidak ada, sampul SVG dipakai.
-
-## Desain
-
-Konsep: katalog dan etalase, bukan halaman promosi. Tata letak rata kiri, garis tipis, dan daftar berbentuk indeks. Latar teal gelap dengan satu warna aksen (kuning marigold) untuk tombol utama, menu aktif, dan sorotan. Font: Chakra Petch (judul) dan Figtree (isi). Token warna ada di `assets/css/style.css`.
-
-## Keamanan dasar
-
-- Semua output dinamis lewat `e()`.
-- Parameter `id`, `q`, `category`, `game`, `min`, `max`, `sort` divalidasi: slug hanya `[a-z0-9-]`, kategori dan game harus ada di data, angka harus bilangan bulat, teks dipangkas dan dibatasi panjangnya, nilai non-teks (array) diabaikan.
-- Form top up mengecek nominal terhadap daftar milik game itu sendiri, sehingga nilai yang diubah-ubah ditolak. Data yang diisi tidak disimpan.
-- ID tidak dikenal menghasilkan halaman 404 yang sebenarnya.
-
-## UI: shadcn/ui lewat Basecoat
-
-shadcn/ui asli adalah komponen React, sehingga tidak bisa dipakai di proyek ini. **Basecoat** (`basecoat-css`) adalah implementasi shadcn/ui untuk HTML biasa + Tailwind: token tema sama (`--primary`, `--border`, `--ring`, ...) dan markup semantik. Yang dipakai: `btn`, `card`, `badge`, `alert`, `breadcrumb`, `field`, `input`, `select`, dan radio. Tidak ada JavaScript Basecoat yang dimuat.
-
-Tema ada di `assets/css/style.css` (blok `.dark`): `--primary` kuning marigold, `--background` teal gelap. Situs selalu gelap (`<html class="dark">`).
-
-Contoh markup (lihat `includes/functions.php` untuk helper `breadcrumb()`, `ui_alert()`, `status_badge()`):
-```html
-<a class="btn" href="#">Utama</a>
-<a class="btn" data-variant="outline" data-size="sm" href="#">Garis tepi</a>
-<span class="badge" data-variant="secondary">Dipesan</span>
-<div class="field"><label for="x">Label</label><input id="x" class="input"></div>
-```
-
-## CSS: dikompilasi, bukan CDN
-
-`assets/css/app.css` adalah hasil build Tailwind v4 + Basecoat dan **sudah disertakan**, jadi situs langsung jalan tanpa Node. Node hanya dibutuhkan jika kamu mengubah gaya atau menambah class Tailwind baru:
-
-```bash
-npm install            # sekali saja
-npm run build:css      # bangun ulang assets/css/app.css
-npm run watch:css      # bangun ulang otomatis saat file berubah
-```
-Edit `assets/css/style.css` (tema dan gaya khusus) atau template PHP, **jangan** edit `app.css` langsung. Node hanya alat build CSS, bukan backend aplikasi.
-
-Yang masih dari internet: font Google (Chakra Petch dan Figtree), yang jatuh ke font sistem jika gagal dimuat.
-
-## Yang sudah diuji
-
-Dengan PHP 8.3 CLI dan server bawaannya: sintaks semua file PHP; status HTTP semua halaman; pencarian dan filter katalog dan marketplace (termasuk min/max yang tertukar, urutan harga, dan parameter sampah atau array); ID tidak valid menghasilkan 404 (termasuk `../`); form top up dengan input valid dan tidak valid untuk game dengan Zone ID, dengan pilihan server, dan tanpa server; nominal yang diubah-ubah; escape payload `<script>`; nilai form tetap setelah error; tidak ada warning PHP; semua tautan dan aset lokal bisa dibuka; tidak ada sisa teks antarmuka berbahasa Inggris.
-
-**Belum diuji:** tampilan dan responsivitas di browser sungguhan, serta hasil render CSS gaya shadcn (kompilasi CSS dan keberadaan class sudah diperiksa, tetapi tampilan visual belum dilihat). Tolong cek di lebar layar HP, tablet, dan desktop.
-
-## Tahap berikutnya
-
-Database (koneksi PDO di `config/` dan `includes/`, lalu ganti `games()`, `accounts()`, `articles()`, dan `topups()` di `functions.php` dengan query), autentikasi, halaman penjual untuk membuat listing, pembayaran dan pelacakan pesanan, serta migrasi ke Laravel (file `data/` menjadi migration dan seeder, `includes/` menjadi layout Blade).
+Karena markup hasil PHP byte-per-byte sekelas dengan markup Week 4, perpindahan
+teknologi ini tidak mengubah tampilan sama sekali — yang berubah hanya tempat
+logikanya berjalan, persis pesan Sprint 04.
