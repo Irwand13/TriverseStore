@@ -1,118 +1,148 @@
-# Week 7 — Sprint 06: MVC — From OOP to MVC
+# Week 9 — Sprint 07: Laravel + CRUD + Database — From MVC to Framework
 
-**Penanggung jawab:** Alfino14 · **Branch acuan:** `week7`
+**Penanggung jawab:** Irwand · **Branch:** `week9`
 
 ## Tema Sprint
 
-Mengorganisasi aplikasi PHP OOP Week 6 ke arsitektur **MVC**: tanggung
-jawab dipisah menjadi **Model** (data), **View** (tampilan), dan
-**Controller** (pengatur alur). Alur request-nya:
+Memindahkan pengelolaan data TriverseStore dari PHP MVC manual (Week 7)
+ke **Laravel + database**: struktur tabel didefinisikan lewat migration,
+Model Eloquent menghubungkan tabel ke Laravel, dan CRUD lengkap
+(tambah, tampil, ubah, hapus) berjalan dengan prinsip yang sama seperti
+di PPT — **data yang tampil harus berasal dari database, bukan hard-code
+di HTML**. Alur request-nya:
 
 ```
-User → request → Controller → meminta data ke Model → Model mengembalikan
-data → Controller meneruskan ke View → View menghasilkan HTML → User
+User → Laravel → Model → Eloquent → Database → Data → View → HTML → User
 ```
 
-Hasil akhir di layar **identik** dengan Week 6 — yang berubah hanya
-organisasi kodenya. Week ini adalah jembatan langsung ke Laravel (framework
-MVC) yang dipakai proyek TriverseStore sebenarnya.
+Hasil akhir di layar **identik** dengan Week 7 — yang berubah hanya
+sumber datanya. Week ini adalah lompatan yang dijanjikan README Week 7:
+dari MVC buatan sendiri ke framework MVC yang sesungguhnya.
 
 ## Pemetaan Sub-Tugas
 
 | Kode | Sub-Tugas | Penerapan di folder ini |
 |------|-----------|-------------------------|
-| W7.1 | Desain Struktur MVC | Folder `app/Models`, `app/Views`, `app/Controllers` memisahkan tiga tanggung jawab; `public/` menjadi satu-satunya folder yang diekspos server (front controller + aset). |
-| W7.2 | Bangun Model & Controller | Model `Game` (typed property + method akses data statis `all()`, `find()`, `filter()`, `related()`), Model `Seller` & `Cart`; `GameController` dengan method `index()`, `show()`, `process()`, `notFound()`. |
-| W7.3 | Bangun View & Hubungkan Alur Penuh | View di `app/Views/games/` menampilkan data dari Controller dengan short echo `<?= ?>`; View tidak pernah mengambil data sendiri. Alur request → Controller → Model → View berjalan untuk katalog, detail, dan 404. |
-| W7.4 | Demo MVC Flow & Review Sprint 06 | Lihat pertanyaan demo di bawah. |
+| W9.1 | Struktur Database | Migration `create_products_table` (id, kode, judul, game, kategori, data penjual, harga, diskon, status, gambar, deskripsi, platform, level, item unggulan, timestamps); dijalankan dengan `php artisan migrate`. |
+| W9.2 | Model | Model `Product` (extends Model, `$fillable` semua kolom) + method yang sama seperti Model Game Week 7 (`getHargaAkhir()`, `getHargaCoret()`, `getBadgeClass()`, `isTerjual()`); Eloquent mengurus data sebagai object (`Product::all()`, `findOrFail($id)`, `create([...])`). |
+| W9.3 | CRUD | `ProductController` dengan `index()`, `show()`, `create()`, `store()`, `edit()`, `update()`, `destroy()` + rute CRUD di `routes/web.php` + Blade views (index, show, create, edit). Seeder mengisi 10 produk kanonis. |
 
 ## Struktur Folder
 
 ```
-week7/
-├── public/
-│   ├── index.php         # FRONT CONTROLLER: satu-satunya pintu masuk (?page=)
-│   ├── css/style.css     # Salinan file CSS yang sama sejak Week 2
-│   └── assets/img/       # Gambar yang sama persis dengan week sebelumnya
+week9/
 ├── app/
-│   ├── Models/
-│   │   ├── Game.php      # Class Week 6 + method akses data (all/find/filter/related)
-│   │   ├── Seller.php    # Class Week 6, kini berperan sebagai Model
-│   │   └── Cart.php      # Class Week 6, kini berperan sebagai Model
-│   ├── Controllers/
-│   │   └── GameController.php   # index(), show(), process(), notFound()
-│   └── Views/
-│       ├── layout.php    # Kerangka HTML + renderLayout() (head/header/footer)
-│       ├── helpers.php   # formatRupiah() + renderKartuProduk() untuk View
-│       ├── games/
-│       │   ├── index.php # View katalog
-│       │   └── detail.php# View detail produk
-│       └── errors/
-│           └── 404.php   # View tidak ditemukan
+│   ├── Http/Controllers/
+│   │   └── ProductController.php   # index, show, create, store, edit, update, destroy
+│   └── Models/
+│       └── Product.php             # Eloquent Model + $fillable + method harga/badge
+├── bootstrap/app.php               # Bootstrap aplikasi Laravel
+├── config/                         # Konfigurasi (app, database, view, session, ...)
+├── database/
+│   ├── migrations/
+│   │   └── 2026_11_15_000000_create_products_table.php
+│   ├── seeders/
+│   │   ├── DatabaseSeeder.php
+│   │   └── ProductSeeder.php       # 10 produk kanonis DATASET.md
+│   └── database.sqlite             # Dibuat saat setup (lihat bawah)
+├── public/
+│   ├── index.php                   # Front controller Laravel
+│   ├── css/style.css               # Salinan file CSS yang sama sejak Week 2
+│   └── assets/img/                 # Gambar yang sama persis dengan week sebelumnya
+├── resources/views/
+│   ├── layouts/app.blade.php       # Kerangka HTML + @yield (pengganti layout.php Week 7)
+│   └── products/
+│       ├── index.blade.php         # Katalog (hero, filter, grid kartu)
+│       ├── show.blade.php          # Detail produk + listing lainnya
+│       ├── create.blade.php        # Form tambah produk
+│       ├── edit.blade.php          # Form ubah produk
+│       ├── _form.blade.php         # Field form bersama create/edit
+│       └── _card.blade.php         # Kartu produk (pengganti renderKartuProduk)
+├── routes/
+│   └── web.php                     # Rute CRUD produk
+├── .env.example                    # Contoh konfigurasi (SQLite sebagai default)
+├── artisan                         # CLI Laravel
+├── composer.json                   # Laravel 11 + dependensi
 └── README.md
 ```
 
-Tidak ada folder `includes/` atau `data/` lagi: partial header/footer
-menjadi `layout.php`, dan file data menjadi tanggung jawab Model.
+Tidak ada lagi `app/Views/*.php` manual: Blade menggantikan
+`layout.php` + `helpers.php` + view `games/`; `Game::all()` statis
+digantikan `Product::all()` Eloquent yang membaca tabel `products`.
 
 ## Cara Menjalankan
 
-Document root diarahkan ke `public/`:
+Folder `vendor/` tidak disertakan di repository — instal dulu:
 
-```bat
-php -S localhost:8000 -t public
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate --seed
+php artisan serve
 ```
 
-(dari folder `week7/`), lalu buka `http://localhost:8000`.
-Rute: katalog = `index.php`, detail = `index.php?page=detail&id=P1`,
-rute tak dikenal = 404. PHP 8.2, tanpa database/framework.
+Lalu buka `http://127.0.0.1:8000`.
+Rute: katalog = `/`, detail = `/products/1`,
+tambah = `/products/create`, ubah = `/products/1/edit`.
+PHP 8.2+, database default SQLite (tanpa MySQL).
 
 ## Poin Penjelasan untuk Dosen
 
-1. **Fungsi tiap komponen:** Model mengelola data (dataset + cara
-   mengambilnya), Controller mengatur proses (membaca parameter request,
-   memutuskan View mana dan data apa), View hanya menampilkan.
-2. **Komunikasi Controller ↔ Model:** Controller memanggil method Model
-   (`Game::filter(...)`, `Game::find(...)`) dan menerima objek kembali —
-   Controller tidak tahu (dan tidak peduli) dari mana data berasal.
-3. **Komunikasi Controller → View:** data diserahkan sebagai array ke
-   `renderLayout()` lalu di-`extract()` menjadi variabel View; View
-   menampilkannya dengan `<?= ?>`.
-4. **Front controller:** satu file `public/index.php` menerima semua
-   request dan memetakan `?page=` ke method Controller — pola yang sama
-   dengan routing Laravel.
-5. **Keuntungan pemisahan:** mengganti sumber data (mis. dari array ke
-   database) cukup mengubah Model; mengganti tampilan cukup mengubah View;
-   keduanya tidak mengganggu Controller.
+1. **Fungsi Migration:** cara Laravel mendefinisikan dan mengelola
+   struktur database lewat kode (`Schema::create`); tabel `products`
+   dibuat dengan `php artisan migrate`, bukan dibuat manual di phpMyAdmin.
+2. **Fungsi Model:** `Product` merepresentasikan tabel `products`
+   sebagai class; `$fillable` mendaftarkan kolom yang boleh diisi massal.
+3. **Fungsi Eloquent:** Model berkomunikasi dengan database dan
+   mengembalikan object — `Product::all()` banyak object,
+   `Product::findOrFail($id)` satu object, `create([...])` simpan baru.
+4. **Alur CRUD:** form tambah/ubah mengirim request → route →
+   Controller memvalidasi → Model menyimpan ke database → redirect
+   dengan pesan sukses → halaman berikutnya membaca ulang dari database.
+5. **Data dari database:** katalog, detail, dan filter membaca tabel
+   `products`; tidak ada lagi array hard-code di dalam Model. Menghapus
+   produk benar-benar menghapus barisnya; menambah produk benar-benar
+   menambah baris baru (buktikan dengan `php artisan tinker` atau
+   membuka file `database/database.sqlite`).
 
-## Pertanyaan Demo (Sprint 06)
+## Pertanyaan Demo (Sprint 07)
 
-- *Apa fungsi Controller?* — Menerima request, mengatur proses, memanggil
-  Model, dan meneruskan data ke View (`GameController::index/show`).
-- *Data apa yang dikelola Model?* — Sepuluh listing akun game dan lima
-  penjual (dataset kanonis proyek) beserta method aksesnya.
-- *Apa yang ditampilkan View?* — Katalog, detail produk, dan halaman 404
-  dalam kerangka layout yang sama.
-- *Bagaimana Controller berkomunikasi dengan Model?* — Memanggil method
-  statis Model dan menerima objek `Game` sebagai hasil.
-- *Bagaimana data sampai ke View?* — Controller menyerahkan array data ke
-  `renderLayout()`; View membaca variabelnya dan mencetak dengan `<?= ?>`.
+- *Apa fungsi Migration?* — Mendefinisikan struktur tabel lewat kode
+  dan menjalankannya dengan `php artisan migrate`.
+- *Apa fungsi Model?* — Menghubungkan tabel dengan Laravel lewat
+  Eloquent (`Product` ↔ tabel `products`).
+- *Apa fungsi Eloquent?* — Mengelola data sebagai object: ambil semua,
+  ambil satu, simpan, ubah, hapus — tanpa menulis query SQL manual.
+- *Apa perbedaan `Product::all()` dan `Product::find(1)`?* —
+  `all()` mengembalikan semua data (banyak object, dipakai katalog);
+  `find(1)` mengembalikan satu data (satu object, dipakai halaman detail).
+- *Apa yang dimaksud CRUD?* — Create (tambah), Read (tampil),
+  Update (ubah), Delete (hapus) — empat operasi dasar pengelolaan data.
+- *Apa yang berubah ketika aplikasi mulai menggunakan database?* —
+  Data tidak lagi hard-code: produk yang tampil adalah isi tabel, dan
+  perubahan lewat form langsung mengubah isi tabel.
 
-## Evolusi dari Week Sebelumnya (Week 6 → Week 7)
+## Evolusi dari Week Sebelumnya (Week 7 → Week 9)
 
 | Berkas/Folder | Perubahan |
 |---------------|-----------|
-| `public/index.php` | **Baru.** Front controller + routing `?page=` sederhana. |
-| `app/Controllers/GameController.php` | **Baru.** Logika yang di Week 6 tersebar di kepala `index.php`/`detail.php` (baca `$_GET`, saring, tentukan 404) kini menjadi method Controller. |
-| `app/Models/Game.php` | Class Game Week 6 **dipindah** dari `classes/` dan ditambah method akses data statis: `all()`, `find()`, `filter()`, `related()`, `sellerCount()`. |
-| `app/Models/Seller.php`, `app/Models/Cart.php` | Class Week 6 **dipindah apa adanya** dari `classes/` (hanya komentar kepala disesuaikan). |
-| `app/Views/games/index.php`, `detail.php` | Badan halaman Week 6 dipotong menjadi View konten; logika pengambilan datanya dibuang — data datang dari Controller. Markup & class tidak berubah. |
-| `app/Views/layout.php` | **Baru.** Pengganti `includes/header.php` + `footer.php`: satu fungsi `renderLayout($judul, $kontenFile, $data)`. |
-| `app/Views/helpers.php` | Fungsi `formatRupiah()` + `renderKartuProduk()` dari `includes/functions.php` Week 6, dipindah khusus untuk View; tautan kartu kini `index.php?page=detail&id=...`. |
-| `data/products.php` | **Dihapus.** Isinya (dataset kanonis) pindah ke `Game::all()` di Model — nilai tidak berubah satu pun. |
+| `app/Models/Game.php` | **Diganti** `app/Models/Product.php`: class yang sama, kini Eloquent Model — dataset statis `all()`/`find()` digantikan query database; method harga/badge/status dipertahankan. |
+| `app/Models/Seller.php`, `app/Models/Cart.php` | **Dihapus.** Sprint 07 hanya membahas satu model/tabel: data penjual disimpan sebagai kolom biasa di tabel `products` (`seller_nama`, `seller_rating`, `seller_penjualan`, `seller_kota`). Relasi antar tabel masuk materi berikutnya. |
+| `app/Controllers/GameController.php` | **Diganti** `app/Http/Controllers/ProductController.php`: `index()`/`show()` dipertahankan, ditambah `create()`, `store()`, `edit()`, `update()`, `destroy()` + validasi form. |
+| `public/index.php` | **Diganti** front controller Laravel (`public/index.php` framework) — routing `?page=` digantikan rute di `routes/web.php`. |
+| `app/Views/` | **Diganti** Blade di `resources/views/`: `layout.php` → `layouts/app.blade.php`, `helpers.php` (`renderKartuProduk`) → partial `_card.blade.php`, `games/index.php` → `products/index.blade.php`, `games/detail.php` → `products/show.blade.php`; ditambah `create.blade.php`, `edit.blade.php`, `_form.blade.php`. |
+| `data/` (dihapus di Week 7) | **Diganti** migration + seeder: dataset kanonis kini hidup di tabel `products` (nilai tidak berubah satu pun). |
 | `public/css/style.css` | **Salinan persis** file CSS yang sama sejak Week 2 (token desain tunggal tidak berubah di seluruh perjalanan). |
 | `public/assets/img/*` | Tidak berubah. |
+| `composer.json`, `artisan`, `bootstrap/`, `config/` | **Baru.** Kerangka Laravel 11. |
 
-Hasilnya: enam week, satu tampilan, satu dataset — setiap week hanya
+Catatan: Controller, Routing, dan Validation yang mendalam baru masuk
+Pertemuan 10 — di Week 9 ini routing ditulis eksplisit per rute dan
+validasi hanya aturan dasar form, sesuai cakupan PPT.
+
+Hasilnya: sembilan week, satu tampilan, satu dataset — setiap week hanya
 mengubah **satu lapisan** (struktur → perilaku → sumber data → sisi server →
-objek → arsitektur), sehingga merge antar week tidak pernah bentrok.
+objek → arsitektur → framework + database), sehingga merge antar week
+tidak pernah bentrok.
