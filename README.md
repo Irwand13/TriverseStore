@@ -1,6 +1,6 @@
-# Week 9 — Sprint 07: Laravel + CRUD + Database — From MVC to Framework
+# Week 10 — Sprint 08: Controller, Routing & Validation — REST API
 
-**Penanggung jawab:** Irwand · **Branch:** `week9`
+**Penanggung jawab:** Irwand · **Branch:** `week10` (lanjutan Sprint 07 di `week9`)
 
 ## Tema Sprint
 
@@ -59,7 +59,8 @@ week9/
 │       ├── _form.blade.php         # Field form bersama create/edit
 │       └── _card.blade.php         # Kartu produk (pengganti renderKartuProduk)
 ├── routes/
-│   └── web.php                     # Rute CRUD produk
+│   ├── web.php                     # Rute CRUD produk
+│   └── api.php                     # REST API produk (Sprint 08)
 ├── .env.example                    # Contoh konfigurasi (SQLite sebagai default)
 ├── artisan                         # CLI Laravel
 ├── composer.json                   # Laravel 11 + dependensi
@@ -87,6 +88,8 @@ Lalu buka `http://127.0.0.1:8000`.
 Rute: katalog = `/`, market = `/market`, tentang = `/tentang`,
 top up = `/topup`, akun = `/akun`, detail = `/products/1`,
 tambah = `/products/create`, ubah = `/products/1/edit`.
+API (Sprint 08): `GET/POST /api/products`,
+`GET/PUT/DELETE /api/products/{id}`.
 PHP 8.2+, database default SQLite (tanpa MySQL).
 
 Catatan laptop (Irwand, 17 Nov 2026): `composer update` diblokir
@@ -135,6 +138,79 @@ tidak perlu `migrate` (tidak ada perubahan skema database).
 Akun lama tidak ada — daftar dulu lewat `/register` sebelum
 mencoba tombol Jual Akun.
 
+## Sprint 08 — REST API + Validasi (Week 10)
+
+Sprint 08 (Pertemuan 10, "Controller, Routing & Validation") adalah
+lanjutan Sprint 07: Task 01 (pindahkan CRUD ke Controller) sudah
+terpenuhi oleh `ProductController` Week 9 — keenam method sudah ada dan
+semua rute web sudah menunjuk ke controller — jadi tidak ada yang
+diulang. Yang baru adalah Task 02 dan Task 03.
+
+**Validasi (Task 02).** Aturan `judul` diperketat dari `max:255` menjadi
+`required|string|max:100` sesuai PPT; `deskripsi_singkat` tetap
+`required`. Pesan error kini Bahasa Indonesia ("Judul wajib diisi.",
+"Judul maksimal 100 karakter.", "Deskripsi wajib diisi.", dst) dan
+dipakai form web maupun respons API. Form juga dibatasi `maxlength`
+100. Perbaikan kecil: `update()` Week 9 hanya mengubah
+`deskripsi_singkat` — sekarang kolom `deskripsi` (yang dipakai halaman
+detail) ikut berubah.
+
+**REST API (Task 03).** Satu controller yang sama melayani web dan API,
+sesuai pola PPT (bukan controller `Api\` terpisah): helper `isApi()`
+mendeteksi rute `/api/*` — request API dijawab JSON, request web tetap
+View/redirect seperti semula. Rute API didaftarkan di `routes/api.php`
+(`Route::apiResource('products', ProductController::class)`) dan
+`bootstrap/app.php` mendaftarkan file rute API — tanpa `install:api`,
+tanpa Sanctum, tanpa package baru.
+
+| Method | Endpoint | Respons |
+|--------|----------|---------|
+| GET | `/api/products` | 200 `{"data": [...]}` |
+| POST | `/api/products` | 201 `{"message": "Berhasil", "data": {...}}` |
+| GET | `/api/products/{id}` | 200 `{"data": {...}}`, 404 bila tidak ada |
+| PUT/PATCH | `/api/products/{id}` | 200 `{"message": "Berhasil", "data": {...}}` |
+| DELETE | `/api/products/{id}` | 200 `{"message": "Produk berhasil dihapus."}` |
+| POST (data kosong) | `/api/products` | 422 `{"message": "...", "errors": {...}}` |
+
+**Tanpa login.** API demo PPT dites lewat Postman tanpa auth, jadi API
+tanpa login: produk yang dibuat lewat API disimpan dengan `user_id`
+null dan `seller_nama` "TriverseStore"; update/hapus lewat API tidak
+mengecek pemilik — komentar kode mencatat aplikasi sungguhan wajib
+pakai token (mis. Sanctum). **Gambar lewat API:** JSON body tanpa file
+harus tetap jalan — produk API tanpa gambar disimpan sebagai string
+kosong `''` (tanpa migrasi, jadi tidak perlu `migrate`); `getGambarUrl()`
+kini null-safe dan keempat Blade yang memakai gambar di-guard, sehingga
+produk tanpa gambar tetap tampil di katalog/detail. Aturan web tidak
+berubah: gambar listing tetap wajib di-upload, tanpa gambar default.
+
+Mencoba API (server jalan di `http://127.0.0.1:8000`):
+
+```bash
+curl http://127.0.0.1:8000/api/products
+curl -X POST http://127.0.0.1:8000/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"judul":"Akun Mobile Legends Sultan","game":"Mobile Legends","kategori":"Akun","harga":250000,"deskripsi_singkat":"Akun sultan, skin lengkap."}'
+curl http://127.0.0.1:8000/api/products/11
+curl -X PUT http://127.0.0.1:8000/api/products/11 \
+  -H "Content-Type: application/json" \
+  -d '{"judul":"Akun Mobile Legends Sultan","game":"Mobile Legends","kategori":"Akun","harga":300000,"deskripsi_singkat":"Akun sultan, skin lengkap."}'
+curl -X DELETE http://127.0.0.1:8000/api/products/11
+curl -X POST http://127.0.0.1:8000/api/products \
+  -H "Content-Type: application/json" -d '{}'
+```
+
+Update di laptop (branch baru `week10`):
+
+```powershell
+cd "D:\SEMESTER 5\WEB\Project\TriverseStore"
+git fetch origin
+git checkout week10
+php artisan serve
+```
+
+Tidak perlu `composer install` (tidak ada package baru) dan tidak perlu
+`migrate` (tidak ada perubahan skema database).
+
 ## Poin Penjelasan untuk Dosen
 
 1. **Fungsi Migration:** cara Laravel mendefinisikan dan mengelola
@@ -153,6 +229,14 @@ mencoba tombol Jual Akun.
    produk benar-benar menghapus barisnya; menambah produk benar-benar
    menambah baris baru (buktikan dengan `php artisan tinker` atau
    membuka file `database/database.sqlite`).
+6. **Fungsi REST API (Sprint 08):** satu controller yang sama melayani
+   web dan API — `isApi()` membedakan request `/api/*` (dijawab JSON)
+   dari request web (dijawab View/redirect); `Route::apiResource`
+   mendaftarkan kelima endpoint sekaligus.
+7. **Fungsi HTTP Status Code (Sprint 08):** 200 sukses, 201 data baru
+   berhasil dibuat, 404 data tidak ditemukan, 422 data gagal validasi —
+   status code memberi tahu client hasil request tanpa harus membaca
+   isi body.
 
 ## Pertanyaan Demo (Sprint 07)
 
@@ -170,6 +254,14 @@ mencoba tombol Jual Akun.
 - *Apa yang berubah ketika aplikasi mulai menggunakan database?* —
   Data tidak lagi hard-code: produk yang tampil adalah isi tabel, dan
   perubahan lewat form langsung mengubah isi tabel.
+- *Apa itu REST API? (Sprint 08)* — Cara aplikasi menyediakan datanya
+  sebagai JSON lewat endpoint HTTP, supaya bisa dipakai program lain
+  (Postman, aplikasi HP) tanpa membuka halaman web.
+- *Apa beda respons web dan API? (Sprint 08)* — Web menjawab dengan
+  halaman HTML (View), API menjawab dengan JSON (`{"data": ...}`).
+- *Apa arti status code 200, 201, 404, 422? (Sprint 08)* — 200 sukses,
+  201 data baru berhasil dibuat, 404 data tidak ditemukan, 422 data
+  gagal validasi (mis. judul kosong atau lebih dari 100 karakter).
 
 ## Evolusi dari Week Sebelumnya (Week 7 → Week 9)
 
@@ -185,9 +277,20 @@ mencoba tombol Jual Akun.
 | `public/assets/img/*` | Tidak berubah. |
 | `composer.json`, `artisan`, `bootstrap/`, `config/` | **Baru.** Kerangka Laravel 11. |
 
-Catatan: Controller, Routing, dan Validation yang mendalam baru masuk
-Pertemuan 10 — di Week 9 ini routing ditulis eksplisit per rute dan
-validasi hanya aturan dasar form, sesuai cakupan PPT.
+## Evolusi Week 9 → Week 10
+
+| Berkas/Folder | Perubahan |
+|---------------|-----------|
+| `routes/api.php` | **Baru.** `Route::apiResource('products', ProductController::class)` — kelima endpoint REST. |
+| `bootstrap/app.php` | **Diubah.** Mendaftarkan file rute API (`api: __DIR__.'/../routes/api.php'`) — tanpa `install:api`, tanpa Sanctum. |
+| `app/Http/Controllers/ProductController.php` | **Diubah.** `show()` menerima `Request` agar bisa mendeteksi request API; helper `isApi()` memisahkan respons JSON (API) dari View/redirect (web); validasi `judul` `max:255` → `max:100` + pesan error Bahasa Indonesia; `update()` kini menyinkronkan `deskripsi` dan `deskripsi_singkat`. |
+| `app/Models/Product.php` | **Diubah.** `getGambarUrl()` null-safe: mengembalikan `null` bila produk tidak punya gambar (produk API). |
+| `resources/views/products/` | **Diubah.** Keempat Blade yang memakai gambar di-guard (`@if ($product->gambar)`); hero fan di katalog difilter produk bergambar; form judul `maxlength` 100. |
+| `routes/web.php`, migration, seeder | Tidak berubah. |
+
+Sprint 08 mengerjakan Controller, Routing, dan Validation yang mendalam
+dari Pertemuan 10: satu controller melayani web dan API, validasi
+diperketat, dan data produk tersedia sebagai JSON lewat REST API.
 
 Hasilnya: sembilan week, satu tampilan, satu dataset — setiap week hanya
 mengubah **satu lapisan** (struktur → perilaku → sumber data → sisi server →

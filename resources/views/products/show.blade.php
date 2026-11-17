@@ -31,7 +31,10 @@
         <div class="detail-grid">
             <div>
                 <div class="detail-media">
-                    <img src="{{ $product->getGambarUrl() }}" alt="Gambar akun {{ $product->judul }}">
+                    {{-- Produk dari API boleh tidak punya gambar. --}}
+                    @if ($product->gambar)
+                        <img src="{{ $product->getGambarUrl() }}" alt="Gambar akun {{ $product->judul }}">
+                    @endif
                 </div>
 
                 <div class="detail-about">

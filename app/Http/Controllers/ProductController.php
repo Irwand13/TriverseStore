@@ -9,9 +9,16 @@ use Illuminate\Support\Str;
 // Controller tetap menjadi perantara seperti di Week 7: menerima
 // request, meminta data ke Model, lalu meneruskan ke View.
 // Bedanya, Model kini membaca dari database lewat Eloquent.
+//
+// Sprint 08: controller yang sama juga melayani REST API
+// (routes/api.php). Bila request datang lewat /api, responsnya
+// JSON; bila lewat web, responsnya tetap View/redirect seperti
+// sebelumnya. Satu controller, dua macam respons — sesuai pola
+// PPT yang memakai satu ProgramController untuk web dan API.
 class ProductController extends Controller
 {
     // Katalog: ambil produk terfilter dari Model, serahkan ke View.
+    // Lewat API: kembalikan daftar yang sama sebagai JSON.
     public function index(Request $request)
     {
         $kategoriAktif = $request->query('kategori', 'Semua');
@@ -26,6 +33,10 @@ class ProductController extends Controller
             }))
             ->orderBy('id')
             ->get();
+
+        if ($this->isApi($request)) {
+            return response()->json(['data' => $products], 200);
+        }
 
         return view('products.index', [
             'products' => $products,
@@ -69,9 +80,14 @@ class ProductController extends Controller
     }
 
     // Detail satu produk; 404 bila id tidak ada di database.
-    public function show($id)
+    // Lewat API: kembalikan produknya sebagai JSON.
+    public function show(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+
+        if ($this->isApi($request)) {
+            return response()->json(['data' => $product], 200);
+        }
 
         $related = Product::where('kategori', $product->kategori)
             ->where('id', '!=', $product->id)
@@ -97,30 +113,48 @@ class ProductController extends Controller
     // yang login; kolom yang tidak ada di form diisi default
     // supaya listing langsung tampil di katalog. Gambar wajib
     // di-upload user — tidak ada lagi gambar default.
+    //
+    // Lewat API (JSON, tanpa login): gambar boleh kosong dan
+    // penjual diisi 'TriverseStore' dengan user_id null, supaya
+    // demo Postman seperti di PPT bisa jalan tanpa auth.
     public function store(Request $request)
     {
-        $data = $request->validate($this->rules(true));
+        $isApi = $this->isApi($request);
+        $data = $request->validate($this->rules(! $isApi), $this->messages());
+
+        $user = $request->user();
 
         $product = Product::create([
-            'user_id' => $request->user()->id,
+            'user_id' => $user?->id,
             'kode' => 'P' . (Product::max('id') + 1),
             'judul' => $data['judul'],
             'game' => $data['game'],
             'kategori' => $data['kategori'],
-            'seller_nama' => $request->user()->name,
+            'seller_nama' => $user?->name ?? 'TriverseStore',
             'seller_rating' => 5.0,
             'seller_penjualan' => 0,
             'seller_kota' => 'Indonesia',
             'harga' => $data['harga'],
             'diskon' => 0,
             'status' => 'Tersedia',
-            'gambar' => $this->simpanGambar($request),
+            // Kolom gambar NOT NULL di skema week9, jadi produk API
+            // tanpa gambar disimpan sebagai string kosong — artinya
+            // "tanpa gambar". getGambarUrl() dan Blade sudah
+            // menanganinya (tidak ada <img> yang dirender).
+            'gambar' => $request->hasFile('gambar') ? $this->simpanGambar($request) : '',
             'deskripsi_singkat' => $data['deskripsi_singkat'],
             'deskripsi' => $data['deskripsi_singkat'],
             'platform' => 'Semua Platform',
             'level' => 'Tidak dicantumkan',
             'item_unggulan' => 'Tidak dicantumkan',
         ]);
+
+        if ($isApi) {
+            return response()->json([
+                'message' => 'Berhasil',
+                'data' => $product,
+            ], 201);
+        }
 
         return redirect()->route('products.show', $product->id)
             ->with('sukses', 'Produk "' . $product->judul . '" berhasil ditambahkan.');
@@ -141,12 +175,19 @@ class ProductController extends Controller
     // Simpan perubahan dari form ubah. Hanya kolom form yang
     // berubah; penjual dan data lain tetap seperti semula.
     // Gambar lama tetap dipakai bila tidak ada upload baru.
+    //
+    // Lewat API: cek pemilik dilewati karena demo API tanpa
+    // login (lihat catatan di pastikanPemilik).
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $this->pastikanPemilik($product);
+        $isApi = $this->isApi($request);
 
-        $data = $request->validate($this->rules(false));
+        if (! $isApi) {
+            $this->pastikanPemilik($product);
+        }
+
+        $data = $request->validate($this->rules(false), $this->messages());
 
         $perubahan = [
             'judul' => $data['judul'],
@@ -154,6 +195,7 @@ class ProductController extends Controller
             'kategori' => $data['kategori'],
             'harga' => $data['harga'],
             'deskripsi_singkat' => $data['deskripsi_singkat'],
+            'deskripsi' => $data['deskripsi_singkat'],
         ];
 
         if ($request->hasFile('gambar')) {
@@ -163,28 +205,60 @@ class ProductController extends Controller
 
         $product->update($perubahan);
 
+        if ($isApi) {
+            return response()->json([
+                'message' => 'Berhasil',
+                'data' => $product,
+            ], 200);
+        }
+
         return redirect()->route('products.show', $product->id)
             ->with('sukses', 'Produk "' . $product->judul . '" berhasil diubah.');
     }
 
     // Hapus produk dari database. Listing milik user lain
     // tidak bisa dihapus.
-    public function destroy($id)
+    //
+    // Lewat API: kembalikan JSON {"message": "Produk berhasil
+    // dihapus."} seperti demo PPT; cek pemilik dilewati
+    // karena demo API tanpa login.
+    public function destroy(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $this->pastikanPemilik($product);
+        $isApi = $this->isApi($request);
+
+        if (! $isApi) {
+            $this->pastikanPemilik($product);
+        }
 
         $this->hapusGambarUpload($product->gambar);
 
         $judul = $product->judul;
         $product->delete();
 
+        if ($isApi) {
+            return response()->json(['message' => 'Produk berhasil dihapus.'], 200);
+        }
+
         return redirect()->route('products.index')
             ->with('sukses', 'Produk "' . $judul . '" berhasil dihapus.');
     }
 
+    // Request API adalah request ke rute /api/* atau yang
+    // minta JSON lewat header Accept.
+    private function isApi(Request $request): bool
+    {
+        return $request->is('api/*') || $request->expectsJson();
+    }
+
     // Listing seeder tidak punya pemilik, jadi boleh diurus
     // user login mana pun; listing ber-pemilik hanya oleh pemiliknya.
+    //
+    // Catatan Sprint 08: cek ini hanya berlaku untuk web. API
+    // demo di PPT tidak memakai login sama sekali, jadi tanpa
+    // user yang bisa dicocokkan, update/hapus lewat API
+    // diizinkan untuk semua produk. Di aplikasi sungguhan,
+    // API seperti ini wajib dilindungi token (mis. Sanctum).
     private function pastikanPemilik(Product $product): void
     {
         if ($product->user_id !== null && $product->user_id !== auth()->id()) {
@@ -196,15 +270,46 @@ class ProductController extends Controller
     // hanya kolom esensial. Kode dan penjual tidak lagi diisi
     // lewat form, melainkan oleh Controller saat menyimpan.
     // Gambar wajib saat tambah, opsional saat ubah (pakai lama).
+    //
+    // Sprint 08: judul mengikuti aturan PPT — maksimal 100
+    // karakter (sebelumnya 255). Gambar opsional bila request
+    // datang lewat API JSON yang tidak membawa file.
     private function rules(bool $gambarWajib): array
     {
         return [
-            'judul' => 'required|string|max:255',
+            'judul' => 'required|string|max:100',
             'game' => 'required|string|max:255',
             'kategori' => 'required|in:MOBA,RPG,FPS,Battle Royale,Aksi,Olahraga',
             'harga' => 'required|integer|min:1000',
             'deskripsi_singkat' => 'required|string|max:500',
             'gambar' => ($gambarWajib ? 'required' : 'nullable') . '|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ];
+    }
+
+    // Pesan error validasi Bahasa Indonesia, mengikuti contoh
+    // PPT ("Nama wajib diisi.", "Nama maksimal 100 karakter.").
+    // Pesan ini yang tampil di form web dan di respons 422 API.
+    private function messages(): array
+    {
+        return [
+            'judul.required' => 'Judul wajib diisi.',
+            'judul.string' => 'Judul harus berupa teks.',
+            'judul.max' => 'Judul maksimal 100 karakter.',
+            'game.required' => 'Game wajib diisi.',
+            'game.string' => 'Game harus berupa teks.',
+            'game.max' => 'Game maksimal 255 karakter.',
+            'kategori.required' => 'Kategori wajib diisi.',
+            'kategori.in' => 'Kategori tidak valid.',
+            'harga.required' => 'Harga wajib diisi.',
+            'harga.integer' => 'Harga harus berupa angka.',
+            'harga.min' => 'Harga minimal Rp 1.000.',
+            'deskripsi_singkat.required' => 'Deskripsi wajib diisi.',
+            'deskripsi_singkat.string' => 'Deskripsi harus berupa teks.',
+            'deskripsi_singkat.max' => 'Deskripsi maksimal 500 karakter.',
+            'gambar.required' => 'Gambar wajib diunggah.',
+            'gambar.image' => 'Gambar harus berupa file gambar.',
+            'gambar.mimes' => 'Gambar harus berformat JPG, JPEG, PNG, atau WebP.',
+            'gambar.max' => 'Gambar maksimal 2 MB.',
         ];
     }
 

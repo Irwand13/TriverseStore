@@ -2,9 +2,13 @@
      Aksi ubah/hapus hanya tampil di halaman Akun lewat $tampilkanAksi. --}}
 <article class="game-card">
     <div class="card-media">
-        <a href="{{ route('products.show', $product->id) }}" aria-label="Lihat detail {{ $product->judul }}">
-            <img src="{{ $product->getGambarUrl() }}" alt="Gambar akun {{ $product->judul }}" loading="lazy">
-        </a>
+        {{-- Produk dari API boleh tidak punya gambar: sembunyikan
+             <img>-nya daripada menampilkan gambar rusak. --}}
+        @if ($product->gambar)
+            <a href="{{ route('products.show', $product->id) }}" aria-label="Lihat detail {{ $product->judul }}">
+                <img src="{{ $product->getGambarUrl() }}" alt="Gambar akun {{ $product->judul }}" loading="lazy">
+            </a>
+        @endif
         @if ($product->diskon > 0)
             <span class="badge badge-promo">&minus;{{ $product->diskon }}%</span>
         @endif
