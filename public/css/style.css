@@ -6,6 +6,8 @@
    Font: Fraunces (display) + Inter (body). Tanpa emoji.
    Token hidup di :root saja — komponen tidak memakai hex mentah.
    Skala spacing kelipatan 4px (0.25rem = 4px).
+   v2.1 (17 Nov): dimensi lebih lega (container 1280/1360), satu
+   entrance hero, wash hangat + aksen warna di dalam palet.
    ============================================================ */
 
 :root {
@@ -50,7 +52,7 @@
     --fs-price-lg: 1.7rem;/* harga pada panel beli */
     --fs-2xl: 1.9rem;     /* judul section & nilai statistik */
     --fs-3xl: 2.1rem;     /* judul halaman detail */
-    --fs-display: clamp(2.2rem, 4.5vw, 3.4rem); /* judul hero */
+    --fs-display: clamp(2.3rem, 4.2vw, 3.6rem); /* judul hero */
 }
 
 * {
@@ -105,8 +107,15 @@ h1, h2, h3, .display {
 }
 
 .container {
-    width: min(1180px, 100% - 3rem);
+    width: min(1280px, 100% - 3rem);
     margin-inline: auto;
+}
+
+/* Layar sangat lebar: kolom melebar sekali lagi, bukan diam di 1280px. */
+@media (min-width: 1600px) {
+    .container {
+        width: min(1360px, 100% - 4rem);
+    }
 }
 
 .narrow {
@@ -232,11 +241,12 @@ h1, h2, h3, .display {
     background-color: var(--white);
     color: var(--ink);
     box-shadow: var(--shadow-sm);
-    transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+    transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
 
 .btn:hover {
     text-decoration: none;
+    transform: translateY(-1px);
 }
 
 .btn:active {
@@ -336,16 +346,19 @@ h1, h2, h3, .display {
 
 /* ---------- Hero ---------- */
 .hero {
-    padding-block: 3.5rem 2.5rem;
+    padding-block: 2.75rem 2rem;
     border-bottom: 1px solid var(--line);
-    background-image: radial-gradient(var(--line-dark) 1px, transparent 1.5px);
-    background-size: 22px 22px;
+    /* Wash hangat: pergeseran nada kecil di dalam netral SewaKu
+       (clay-soft -> paper), bukan gradien antar-hue. Titik-titik
+       tetap ada di atasnya sebagai tekstur. */
+    background-image: radial-gradient(var(--line-dark) 1px, transparent 1.5px), linear-gradient(180deg, var(--clay-soft) 0%, var(--paper) 78%);
+    background-size: 22px 22px, auto;
 }
 
 .hero-grid {
     display: grid;
     grid-template-columns: 1.05fr 0.95fr;
-    gap: 3rem;
+    gap: 3.5rem;
     align-items: center;
 }
 
@@ -367,6 +380,29 @@ h1, h2, h3, .display {
     color: var(--ink-soft);
     max-width: 52ch;
 }
+
+/* Satu entrance saat load: fade + naik 14px, berurutan dari atas.
+   Hanya hero; tanpa float/pulse berulang (unslop §9: gerak berulang
+   tanpa alasan dihapus). Transform/opacity saja, tanpa layout shift. */
+@keyframes hero-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero .eyebrow,
+.hero h1,
+.hero .lead,
+.hero-search,
+.hero .stat-row,
+.hero-visual {
+    animation: hero-rise 600ms var(--ease) both;
+}
+
+.hero h1 { animation-delay: 70ms; }
+.hero .lead { animation-delay: 140ms; }
+.hero-search { animation-delay: 210ms; }
+.hero .stat-row { animation-delay: 280ms; }
+.hero-visual { animation-duration: 650ms; animation-delay: 200ms; }
 
 .hero-actions {
     margin-top: 1.75rem;
@@ -441,7 +477,7 @@ h1, h2, h3, .display {
 
 .stat-row .stat-value {
     font-family: var(--font-display);
-    font-size: var(--fs-2xl);
+    font-size: 2.1rem;
     font-weight: 600;
     line-height: 1.1;
     font-variant-numeric: tabular-nums;
@@ -509,13 +545,13 @@ h1, h2, h3, .display {
 
 .fan {
     position: relative;
-    aspect-ratio: 16 / 8.5;
+    aspect-ratio: 16 / 9;
 }
 
 .fan-card {
     position: absolute;
     top: 0;
-    width: 72%;
+    width: 76%;
     border-radius: var(--radius-lg);
     overflow: hidden;
     border: 1px solid var(--line);
@@ -627,6 +663,11 @@ h1, h2, h3, .display {
 
 .section-head h2 {
     font-size: var(--fs-2xl);
+    /* Aksen seksi: garis bawah terracotta mengikuti lebar teks. */
+    text-decoration: underline;
+    text-decoration-color: var(--clay);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 8px;
 }
 
 .section-head p {
@@ -646,7 +687,7 @@ h1, h2, h3, .display {
 .cat-tile {
     position: relative;
     isolation: isolate;
-    min-height: 148px;
+    min-height: 192px;
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
@@ -670,7 +711,7 @@ h1, h2, h3, .display {
 }
 
 .cat-tile:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
     box-shadow: var(--shadow-md);
     text-decoration: none;
 }
@@ -687,7 +728,7 @@ h1, h2, h3, .display {
 .cat-tile .cat-name {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     line-height: 1.3;
 }
 
@@ -816,8 +857,8 @@ h1, h2, h3, .display {
 }
 
 .filter-chip.active {
-    background-color: var(--ink);
-    border-color: var(--ink);
+    background-color: var(--clay);
+    border-color: var(--clay);
     color: var(--paper);
 }
 
@@ -882,7 +923,7 @@ h1, h2, h3, .display {
 /* ---------- Kartu produk ---------- */
 .game-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
     gap: 1.25rem;
 }
 
@@ -894,17 +935,18 @@ h1, h2, h3, .display {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+    transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
 
 .game-card:hover {
-    border-color: var(--line-dark);
+    border-color: var(--clay);
     box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
 }
 
 .game-card .card-media {
     position: relative;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 16 / 10;
     background-color: var(--sage-soft);
 }
 
@@ -2067,6 +2109,10 @@ h1, h2, h3, .display {
 
     .cat-tiles {
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    .cat-tile {
+        min-height: 168px;
     }
 }
 
