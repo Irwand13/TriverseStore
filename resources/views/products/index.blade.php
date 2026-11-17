@@ -34,7 +34,9 @@
                 </div>
             </div>
             @php
-                $heroPicks = $products->take(3);
+                // Etalase hero hanya memakai produk yang punya gambar;
+                // produk dari API tanpa gambar tidak ikut dikipas.
+                $heroPicks = $products->whereNotNull('gambar')->take(3);
                 $heroDepan = $heroPicks->last();
             @endphp
             @if ($heroPicks->count() > 0)

@@ -32,8 +32,15 @@ class Product extends Model
 
     // URL publik gambar: upload user tinggal di uploads/products,
     // sepuluh key art seeder tetap di assets/img.
-    public function getGambarUrl(): string
+    // Produk dari API boleh tidak punya gambar (null) — kembalikan
+    // null supaya Blade bisa menyembunyikan tag <img>-nya
+    // daripada crash di str_starts_with.
+    public function getGambarUrl(): ?string
     {
+        if (empty($this->gambar)) {
+            return null;
+        }
+
         if (str_starts_with($this->gambar, 'uploads/')) {
             return asset($this->gambar);
         }

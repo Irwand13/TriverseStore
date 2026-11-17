@@ -5,7 +5,8 @@
      validasi gagal. Penjual diisi otomatis dari akun login. --}}
 <div class="form-group">
     <label for="judul">Judul Listing</label>
-    <input type="text" id="judul" name="judul" value="{{ old('judul', $product->judul ?? '') }}" maxlength="255" required>
+    <input type="text" id="judul" name="judul" value="{{ old('judul', $product->judul ?? '') }}" maxlength="100" required>
+    <p class="form-hint">Maksimal 100 karakter.</p>
     @error('judul')<p class="form-error">{{ $message }}</p>@enderror
 </div>
 
@@ -44,8 +45,11 @@
 <div class="form-group">
     <label for="gambar">Gambar Akun (wajib)</label>
     @isset($product)
-        <img class="form-preview" src="{{ $product->getGambarUrl() }}" alt="Gambar {{ $product->game }}">
-        <p class="form-hint">Kosongkan bila tetap memakai gambar di atas.</p>
+        {{-- Produk dari API boleh tidak punya gambar. --}}
+        @if ($product->gambar)
+            <img class="form-preview" src="{{ $product->getGambarUrl() }}" alt="Gambar {{ $product->game }}">
+            <p class="form-hint">Kosongkan bila tetap memakai gambar di atas.</p>
+        @endif
         <input type="file" id="gambar" name="gambar" accept="image/*">
     @else
         <input type="file" id="gambar" name="gambar" accept="image/*" required>
