@@ -5,7 +5,7 @@
         <div class="container hero-grid">
             <div>
                 <span class="eyebrow"><span class="dot"></span>Marketplace akun game Indonesia, dilindungi rekber</span>
-                <h1>Akun game pilihan, transaksi aman pakai rekber.</h1>
+                <h1>Akun game pilihan, transaksi aman pakai <em>rekber</em>.</h1>
                 <p class="lead">TriverseStore mempertemukan pembeli dan penjual akun game terverifikasi. Dana diteruskan ke penjual hanya setelah akun berpindah tangan dengan aman.</p>
                 <form class="hero-search" method="get" action="{{ route('market') }}" role="search">
                     <input type="search" name="q" placeholder="Cari akun, game, atau kategori" aria-label="Cari akun" value="{{ $kataKunci }}">
@@ -33,36 +33,31 @@
                     </div>
                 </div>
             </div>
-            <div class="escrow-card">
-                <div class="escrow-head">
-                    <span class="escrow-title">Cara kerja rekber</span>
-                    <span class="badge badge-available">Dana ditahan sistem</span>
-                </div>
-                <h3>Uangmu tidak langsung pergi ke penjual.</h3>
-                <p>Setiap transaksi melewati rekening bersama TriverseStore. Penjual baru dibayar setelah akun benar-benar ada di tanganmu dan sesuai deskripsi.</p>
-                <div class="timeline">
-                    <div class="timeline-track">
-                        <span class="tl-dot done">1</span>
-                        <span class="tl-line done"></span>
-                        <span class="tl-dot done">2</span>
-                        <span class="tl-line"></span>
-                        <span class="tl-dot">3</span>
-                        <span class="tl-line"></span>
-                        <span class="tl-dot">4</span>
+            @php
+                $heroPicks = $products->take(3);
+                $heroDepan = $heroPicks->last();
+            @endphp
+            @if ($heroPicks->count() > 0)
+                <div class="hero-visual">
+                    <div class="fan">
+                        @foreach ($heroPicks as $pick)
+                            <a class="fan-card fan-{{ $loop->index }}" href="{{ route('products.show', $pick->id) }}" aria-label="Lihat detail {{ $pick->judul }}">
+                                <img src="{{ $pick->getGambarUrl() }}" alt="Gambar akun {{ $pick->judul }}">
+                                @if ($loop->last)
+                                    <span class="fan-chip fan-chip-harga">Rp {{ number_format($pick->getHargaAkhir(), 0, ',', '.') }} · {{ $pick->status }}</span>
+                                @endif
+                            </a>
+                        @endforeach
+                        <span class="fan-chip fan-chip-rekber">Dana ditahan sistem</span>
                     </div>
-                    <div class="timeline-labels">
-                        <span>Bayar</span>
-                        <span>Dana ditahan</span>
-                        <span>Serah terima</span>
-                        <span>Selesai</span>
+                    <p class="fan-caption"><strong>{{ $heroDepan->judul }}</strong> · {{ $heroDepan->seller_nama }} · rating {{ number_format($heroDepan->seller_rating, 1) }}</p>
+                    <div class="hero-trust">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                        <span>Dana ditahan sistem — penjual dibayar setelah akun diterima dan sesuai deskripsi.</span>
+                        <a href="{{ route('tentang') }}#cara-rekber">Pelajari cara kerja rekber</a>
                     </div>
                 </div>
-                <div class="escrow-note">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-                    <span>Tidak sesuai deskripsi? Ajukan komplain dan dana kembali 100%.</span>
-                </div>
-                <a class="escrow-link" href="{{ route('tentang') }}#cara-rekber">Pelajari cara kerja rekber</a>
-            </div>
+            @endif
         </div>
     </section>
 
@@ -75,11 +70,13 @@
                 </div>
                 <a class="btn btn-secondary btn-sm" href="{{ route('market') }}">Lihat semua game</a>
             </div>
+            @php
+                $ubinGambar = ['MOBA' => 'moba', 'RPG' => 'rpg', 'FPS' => 'fps', 'Battle Royale' => 'battle-royale', 'Aksi' => 'aksi', 'Olahraga' => 'olahraga'];
+            @endphp
             <div class="cat-tiles">
                 @foreach ($kategoriList as $kategori)
                     @if ($kategori !== 'Semua')
-                        <a class="cat-tile" href="{{ route('market', ['kategori' => $kategori]) }}">
-                            <span class="cat-initial">{{ strtoupper(substr($kategori, 0, 1)) }}</span>
+                        <a class="cat-tile cat-{{ $ubinGambar[$kategori] ?? 'lainnya' }}" href="{{ route('market', ['kategori' => $kategori]) }}">
                             <span class="cat-name">{{ $kategori }}</span>
                         </a>
                     @endif
@@ -135,18 +132,32 @@
     <section class="section section-tight" id="rekber">
         <div class="container">
             <div class="rekber-strip">
-                <div class="rekber-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-                </div>
                 <div>
+                    <span class="badge badge-available">Dana ditahan sistem</span>
                     <h2>Transaksi aman dengan rekening bersama</h2>
                     <p>Pembayaranmu ditahan oleh TriverseStore dan baru diteruskan ke penjual setelah kamu mengonfirmasi akun diterima dan bisa diakses penuh.</p>
                 </div>
-                <div class="rekber-steps">
-                    <span class="rekber-step">Bayar ke TriverseStore</span>
-                    <span class="rekber-step">Dana ditahan sistem</span>
-                    <span class="rekber-step">Serah terima akun</span>
-                    <span class="rekber-step">Dana diteruskan</span>
+                <div class="escrow-steps">
+                    <div class="escrow-step">
+                        <div class="step-num">01</div>
+                        <h3>Bayar ke TriverseStore</h3>
+                        <p>Bayar lewat kanal yang tersedia, dana masuk rekening bersama.</p>
+                    </div>
+                    <div class="escrow-step">
+                        <div class="step-num">02</div>
+                        <h3>Dana ditahan sistem</h3>
+                        <p>Dana dipegang TriverseStore, bukan penjual.</p>
+                    </div>
+                    <div class="escrow-step">
+                        <div class="step-num">03</div>
+                        <h3>Serah terima akun</h3>
+                        <p>Penjual menyerahkan akun, kamu cek isinya.</p>
+                    </div>
+                    <div class="escrow-step">
+                        <div class="step-num">04</div>
+                        <h3>Dana diteruskan</h3>
+                        <p>Konfirmasi akun diterima, dana diteruskan ke penjual.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -173,6 +184,18 @@
                     <h3>Garansi refund penuh</h3>
                     <p>Penjual tidak menyerahkan akun dalam 1×24 jam? Dana otomatis kembali ke pembeli.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-tight">
+        <div class="container">
+            <div class="cta-band">
+                <div>
+                    <h2>Punya akun game nganggur?</h2>
+                    <p>Jual lewat TriverseStore — dana pembeli ditahan rekber sampai akun dikonfirmasi diterima.</p>
+                </div>
+                <a class="btn btn-light" href="{{ route('products.create') }}">Jual Akun</a>
             </div>
         </div>
     </section>
