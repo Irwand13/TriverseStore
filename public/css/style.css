@@ -1975,12 +1975,124 @@ h1, h2, h3, .display {
 /* ---------- Auth ---------- */
 .auth-wrap {
     padding-block: 3rem;
+    /* Wash yang sama dengan hero: titik-titik + hangat, supaya
+       halaman masuk/daftar terasa satu keluarga dengan beranda. */
+    background-image: radial-gradient(var(--line-dark) 1px, transparent 1.5px), linear-gradient(180deg, var(--clay-soft) 0%, var(--paper) 78%);
+    background-size: 22px 22px, auto;
+    border-bottom: 1px solid var(--line);
+}
+
+/* Split dua kolom ala produk nyata (Devault/Saaspo): panel merek
+   gelap di kiri, form di kanan. Kartu polos di tengah adalah layout
+   default AI — diganti, bukan dipoles. Pola dua kolom ini juga
+   dipakai GameVault 05-topup (form + panel samping). */
+.auth-layout {
+    display: grid;
+    grid-template-columns: 0.92fr 1.08fr;
+    max-width: 960px;
+    margin-inline: auto;
+    background-color: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.auth-brand {
+    background-color: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    border-top: 3px solid var(--clay);
+}
+
+.auth-brand h2 {
+    color: var(--paper);
+    font-size: var(--fs-2xl);
+    max-width: 16ch;
+}
+
+.auth-brand h2 em {
+    font-style: italic;
+    color: var(--clay-soft);
+}
+
+.auth-brand-lead {
+    color: var(--ink-on-dark);
+    font-size: var(--fs-base);
+    max-width: 38ch;
+}
+
+.auth-steps {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+.auth-trust {
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+/* Kartu form: tanpa border/shadow sendiri, bingkainya .auth-layout. */
+.auth-layout .form-card {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 2.25rem 2.25rem 2rem;
+}
+
+.auth-card h2 {
+    /* Garis bawah terracotta mengikuti lebar teks, seperti section-head. */
+    text-decoration: underline;
+    text-decoration-color: var(--clay);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 8px;
+    padding-bottom: 0.25rem;
 }
 
 .auth-foot {
     margin-top: 1rem;
     font-size: 0.9rem;
     color: var(--ink-soft);
+}
+
+.auth-foot a {
+    transition: color var(--dur-fast) var(--ease);
+}
+
+/* Entrance: bahasa yang sama dengan hero-rise — fade + naik 14px,
+   berurutan dari atas. Tanpa float/pulse/loop (unslop §9). */
+.auth-brand,
+.auth-card,
+.auth-card .form-group,
+.auth-card .btn-block,
+.auth-card .auth-foot {
+    animation: hero-rise 600ms var(--ease) both;
+}
+
+.auth-card { animation-delay: 90ms; }
+.auth-card .form-group:nth-of-type(1) { animation-delay: 150ms; }
+.auth-card .form-group:nth-of-type(2) { animation-delay: 220ms; }
+.auth-card .form-group:nth-of-type(3) { animation-delay: 290ms; }
+.auth-card .form-group:nth-of-type(4) { animation-delay: 360ms; }
+.auth-card .btn-block { animation-delay: 430ms; }
+.auth-card .auth-foot { animation-delay: 500ms; }
+
+/* Fokus input: ring lembut clay-soft di atas outline yang sudah ada. */
+.form-group input {
+    transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+
+.form-group input:focus {
+    box-shadow: 0 0 0 4px var(--clay-soft);
+}
+
+/* Tombol utama auth: hover mengangkat + bayangan lebih dalam. */
+.auth-card .btn-primary:hover {
+    box-shadow: var(--shadow-md);
 }
 
 /* ---------- Navigasi bawah (HP) ---------- */
@@ -2059,6 +2171,7 @@ h1, h2, h3, .display {
     .hero-grid,
     .detail-grid,
     .market-layout,
+    .auth-layout,
     .topup-layout {
         grid-template-columns: 1fr;
     }
@@ -2147,6 +2260,27 @@ h1, h2, h3, .display {
 
     .hero {
         padding-block: 2rem 1.5rem;
+    }
+
+    /* Auth HP: panel merek merapat di atas form, padding mengecil. */
+    .auth-wrap {
+        padding-block: 2rem;
+    }
+
+    .auth-brand {
+        padding: 1.75rem 1.5rem;
+    }
+
+    /* Eyebrow di panel gelap tetap pill sage (aturan 640px hero
+       membuatnya transparan — di atas ink teksnya tak terbaca). */
+    .auth-brand .eyebrow {
+        background-color: var(--sage-soft);
+        border-color: var(--sage);
+        padding-inline: 0.75rem;
+    }
+
+    .auth-layout .form-card {
+        padding: 1.75rem 1.5rem 1.5rem;
     }
 
     .hero h1 {
