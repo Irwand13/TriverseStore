@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 // Controller tetap menjadi perantara seperti di Week 7: menerima
 // request, meminta data ke Model, lalu meneruskan ke View.
@@ -37,6 +36,37 @@ class ProductController extends Controller
         ]);
     }
 
+    // Market: katalog lengkap dengan cari, filter kategori,
+    // dan urutkan harga. Home tetap menampilkan semua produk
+    // sebagai landing; market yang jadi halaman belanjanya.
+    public function market(Request $request)
+    {
+        $kategoriAktif = $request->query('kategori', 'Semua');
+        $kataKunci = trim($request->query('q', ''));
+        $urut = $request->query('urut', 'terbaru');
+
+        $products = Product::query()
+            ->when($kategoriAktif !== 'Semua', fn ($query) => $query->where('kategori', $kategoriAktif))
+            ->when($kataKunci !== '', fn ($query) => $query->where(function ($query) use ($kataKunci) {
+                $query->where('judul', 'like', '%' . $kataKunci . '%')
+                    ->orWhere('game', 'like', '%' . $kataKunci . '%')
+                    ->orWhere('kategori', 'like', '%' . $kataKunci . '%');
+            }))
+            ->when($urut === 'termurah', fn ($query) => $query->orderBy('harga'))
+            ->when($urut === 'termahal', fn ($query) => $query->orderByDesc('harga'))
+            ->when($urut === 'terbaru', fn ($query) => $query->orderByDesc('id'))
+            ->when($urut === 'terlama', fn ($query) => $query->orderBy('id'))
+            ->get();
+
+        return view('market', [
+            'products' => $products,
+            'kategoriAktif' => $kategoriAktif,
+            'kataKunci' => $kataKunci,
+            'urut' => $urut,
+            'kategoriList' => $this->kategoriList(),
+        ]);
+    }
+
     // Detail satu produk; 404 bila id tidak ada di database.
     public function show($id)
     {
@@ -63,21 +93,43 @@ class ProductController extends Controller
         ]);
     }
 
-    // Simpan produk baru dari form.
+    // Simpan produk baru dari form. Penjual diisi dari akun
+    // yang login; kolom yang tidak ada di form diisi default
+    // supaya listing langsung tampil di katalog.
     public function store(Request $request)
     {
         $data = $request->validate($this->rules());
 
-        $product = Product::create($data);
+        $product = Product::create([
+            'user_id' => $request->user()->id,
+            'kode' => 'P' . (Product::max('id') + 1),
+            'judul' => $data['judul'],
+            'game' => $data['game'],
+            'kategori' => $data['kategori'],
+            'seller_nama' => $request->user()->name,
+            'seller_rating' => 5.0,
+            'seller_penjualan' => 0,
+            'seller_kota' => 'Indonesia',
+            'harga' => $data['harga'],
+            'diskon' => 0,
+            'status' => 'Tersedia',
+            'gambar' => $data['gambar'] ?? $this->gambarUntukGame($data['game']),
+            'deskripsi_singkat' => $data['deskripsi_singkat'],
+            'deskripsi' => $data['deskripsi_singkat'],
+            'platform' => 'Semua Platform',
+            'level' => 'Tidak dicantumkan',
+            'item_unggulan' => 'Tidak dicantumkan',
+        ]);
 
         return redirect()->route('products.show', $product->id)
             ->with('sukses', 'Produk "' . $product->judul . '" berhasil ditambahkan.');
     }
 
-    // Form ubah produk.
+    // Form ubah produk. Listing milik user lain tidak bisa diubah.
     public function edit($id)
     {
         $product = Product::findOrFail($id);
+        $this->pastikanPemilik($product);
 
         return view('products.edit', [
             'product' => $product,
@@ -86,22 +138,35 @@ class ProductController extends Controller
         ]);
     }
 
-    // Simpan perubahan dari form ubah.
+    // Simpan perubahan dari form ubah. Hanya kolom form yang
+    // berubah; penjual dan data lain tetap seperti semula.
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $data = $request->validate($this->rules($product->id));
+        $this->pastikanPemilik($product);
 
-        $product->update($data);
+        $data = $request->validate($this->rules());
+
+        $product->update([
+            'judul' => $data['judul'],
+            'game' => $data['game'],
+            'kategori' => $data['kategori'],
+            'harga' => $data['harga'],
+            'deskripsi_singkat' => $data['deskripsi_singkat'],
+            'gambar' => $data['gambar'] ?? $product->gambar,
+        ]);
 
         return redirect()->route('products.show', $product->id)
             ->with('sukses', 'Produk "' . $product->judul . '" berhasil diubah.');
     }
 
-    // Hapus produk dari database.
+    // Hapus produk dari database. Listing milik user lain
+    // tidak bisa dihapus.
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+        $this->pastikanPemilik($product);
+
         $judul = $product->judul;
         $product->delete();
 
@@ -109,34 +174,41 @@ class ProductController extends Controller
             ->with('sukses', 'Produk "' . $judul . '" berhasil dihapus.');
     }
 
-    // Aturan validasi form tambah/ubah. Saat ubah, kode boleh
-    // tetap sama dengan kode produk itu sendiri.
-    private function rules($kecualiId = null): array
+    // Listing seeder tidak punya pemilik, jadi boleh diurus
+    // user login mana pun; listing ber-pemilik hanya oleh pemiliknya.
+    private function pastikanPemilik(Product $product): void
     {
-        $kode = Rule::unique('products', 'kode');
-        if ($kecualiId !== null) {
-            $kode = $kode->ignore($kecualiId);
+        if ($product->user_id !== null && $product->user_id !== auth()->id()) {
+            abort(403);
         }
+    }
 
+    // Aturan validasi form tambah/ubah yang sudah dipendekkan:
+    // hanya kolom esensial. Kode dan penjual tidak lagi diisi
+    // lewat form, melainkan oleh Controller saat menyimpan.
+    private function rules(): array
+    {
         return [
-            'kode' => ['required', 'string', 'max:10', $kode],
             'judul' => 'required|string|max:255',
             'game' => 'required|string|max:255',
             'kategori' => 'required|in:MOBA,RPG,FPS,Battle Royale,Aksi,Olahraga',
-            'seller_nama' => 'required|string|max:255',
-            'seller_rating' => 'required|numeric|min:0|max:5',
-            'seller_penjualan' => 'required|integer|min:0',
-            'seller_kota' => 'required|string|max:255',
-            'harga' => 'required|integer|min:0',
-            'diskon' => 'required|integer|min:0|max:100',
-            'status' => 'required|in:Tersedia,Stok Terbatas,Terjual',
-            'gambar' => 'required|string|max:255',
-            'deskripsi_singkat' => 'required|string',
-            'deskripsi' => 'required|string',
-            'platform' => 'required|string|max:255',
-            'level' => 'required|string|max:255',
-            'item_unggulan' => 'required|string',
+            'harga' => 'required|integer|min:1000',
+            'deskripsi_singkat' => 'required|string|max:500',
+            'gambar' => 'nullable|string|max:255',
         ];
+    }
+
+    // Gambar default mengikuti nama game bila cocok dengan
+    // salah satu key art kanonis; kalau tidak, pakai yang pertama.
+    private function gambarUntukGame(string $game): string
+    {
+        foreach ($this->gambarList() as $file => $namaGame) {
+            if (strtolower($namaGame) === strtolower($game)) {
+                return $file;
+            }
+        }
+
+        return 'mobile-legends.jpg';
     }
 
     private function kategoriList(): array

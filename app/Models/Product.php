@@ -11,11 +11,17 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
-        'kode', 'judul', 'game', 'kategori',
+        'user_id', 'kode', 'judul', 'game', 'kategori',
         'seller_nama', 'seller_rating', 'seller_penjualan', 'seller_kota',
         'harga', 'diskon', 'status', 'gambar',
         'deskripsi_singkat', 'deskripsi', 'platform', 'level', 'item_unggulan',
     ];
+
+    // Akun yang membuat listing; null untuk sepuluh produk seeder.
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     protected $casts = [
         'seller_rating' => 'float',

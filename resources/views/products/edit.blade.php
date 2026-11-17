@@ -6,7 +6,7 @@
             <div class="container" style="max-width: 720px;">
                 <div class="form-card">
                     <h2>Ubah Produk</h2>
-                    <p>Mengubah listing "{{ $product->judul }}". Kode produk tidak bisa diubah.</p>
+                    <p>Mengubah listing "{{ $product->judul }}". Penjual mengikuti akunmu dan tidak bisa diubah dari sini.</p>
                     <form method="POST" action="{{ route('products.update', $product->id) }}">
                         @csrf
                         @method('PUT')

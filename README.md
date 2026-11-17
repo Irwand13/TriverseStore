@@ -84,9 +84,49 @@ php artisan serve
 ```
 
 Lalu buka `http://127.0.0.1:8000`.
-Rute: katalog = `/`, detail = `/products/1`,
+Rute: katalog = `/`, market = `/market`, tentang = `/tentang`,
+top up = `/topup`, akun = `/akun`, detail = `/products/1`,
 tambah = `/products/create`, ubah = `/products/1/edit`.
 PHP 8.2+, database default SQLite (tanpa MySQL).
+
+Catatan laptop (Irwand, 17 Nov 2026): `composer update` diblokir
+security advisory Composer 2.11 — pakai `composer install` (dari lock).
+PHP 8.2.34 Laragon: lock mengunci `laravel/pint` 1.32.3 yang butuh
+PHP 8.3, jadi instal pakai `composer install --no-dev` (pint hanya
+paket dev). Ekstensi `pdo_sqlite` harus aktif di php.ini Laragon
+(`C:\laragon\bin\php\php-8.2.34-nts-Win32-vs16-x64\php.ini`).
+
+## Upgrade 17 Nov 2026 — Halaman Baru + Auth + Form Pendek
+
+- **Halaman baru:** Tentang Kami (`/tentang`), Market (`/market`,
+  cari + filter kategori + urutkan harga), Top Up (`/topup`, form +
+  ringkasan order demo, tanpa payment gateway), Akun (`/akun`).
+- **Auth hand-rolled** (tanpa package baru): `RegisterController` +
+  `LoginController`, rute `/register`, `/login`, `/logout`, tabel
+  `users` + `password_reset_tokens`. Daftar/masuk dulu sebelum bisa
+  jual akun: rute create/store/edit/update/destroy dipagari middleware
+  `auth`; tamu diarahkan ke `/login`.
+- **Form listing dipendekkan** (`products/_form.blade.php`): tinggal
+  judul, game, kategori, harga, deskripsi singkat, gambar opsional.
+  Kode dibuat otomatis (`P` + id), penjual diisi dari nama akun login,
+  kolom lain diisi default oleh Controller. Migration baru
+  `add_user_id_to_products_table` mengikat listing ke akun pembuatnya
+  supaya tampil di "Listing saya".
+- **Top up:** tabel `top_up_orders` (game, nominal, ID akun game,
+  status demo "Menunggu"); order milik user login tampil di Akun.
+
+Update di laptop yang sudah jalan Week 9:
+
+```powershell
+cd "D:\SEMESTER 5\WEB\Project\TriverseStore"
+git pull origin week9
+php artisan migrate
+php artisan serve
+```
+
+Tidak perlu `composer install` ulang (tidak ada package baru).
+Akun lama tidak ada — daftar dulu lewat `/register` sebelum
+mencoba tombol Jual Akun.
 
 ## Poin Penjelasan untuk Dosen
 
