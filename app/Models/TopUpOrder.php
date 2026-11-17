@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class TopUpOrder extends Model
 {
     protected $fillable = [
-        'user_id', 'game', 'nominal', 'game_user_id', 'status',
+        'user_id', 'game', 'paket', 'nominal', 'game_user_id', 'status',
     ];
 
     protected $casts = [

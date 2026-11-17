@@ -122,8 +122,12 @@ paket dev). Ekstensi `pdo_sqlite` harus aktif di php.ini Laragon
   File tersimpan di `public/uploads/products/` (nama unik) sehingga
   langsung tampil tanpa `storage:link`. Tidak ada lagi gambar default
   dari nama game — listing tanpa upload gambar ditolak validasi.
-- **Top up:** tabel `top_up_orders` (game, nominal, ID akun game,
-  status demo "Menunggu"); order milik user login tampil di Akun.
+- **Top up:** tabel `top_up_orders` (game, paket yang dipilih,
+  nominal = harga paket, ID akun game, status demo "Menunggu");
+  paket mengikuti pola Codashop (harga dari Codashop / itemku,
+  dicek 17 Nov 2026); game tanpa paket terverifikasi (Roblox, Honor
+  of Kings, Call of Duty: Mobile) tetap memakai nominal rupiah.
+  Order milik user login tampil di Akun.
 
 Update di laptop yang sudah jalan Week 9:
 
@@ -205,11 +209,14 @@ Update di laptop (branch baru `week10`):
 cd "D:\SEMESTER 5\WEB\Project\TriverseStore"
 git fetch origin
 git checkout week10
+php artisan migrate
 php artisan serve
 ```
 
-Tidak perlu `composer install` (tidak ada package baru) dan tidak perlu
-`migrate` (tidak ada perubahan skema database).
+Tidak perlu `composer install` (tidak ada package baru). `migrate`
+WAJIB dijalankan sekali — migrasi baru menambah kolom `paket`
+(nullable) ke tabel `top_up_orders`; order lama tetap jalan
+(kolomnya kosong).
 
 ## Poin Penjelasan untuk Dosen
 

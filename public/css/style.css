@@ -1962,14 +1962,18 @@ h1, h2, h3, .display {
 
 /* Nominal sebagai tile radio: name/value SAMA dengan select lama, jadi
    payload POST + validasi + old() tetap identik. Tile pertama terpilih
-   secara default — sama seperti select yang selalu mengirim opsi pertama. */
-.nominal-tiles {
+   secara default — sama seperti select yang selalu mengirim opsi pertama.
+   Kelas .paket-* memakai tampilan yang sama untuk tile paket mata uang
+   game (pola Codashop: pilih game dulu, lalu paketnya). */
+.nominal-tiles,
+.paket-tiles {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
 }
 
-.nominal-tile {
+.nominal-tile,
+.paket-tile {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -1986,30 +1990,35 @@ h1, h2, h3, .display {
     transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
 }
 
-.nominal-tile:hover {
+.nominal-tile:hover,
+.paket-tile:hover {
     border-color: var(--clay);
     transform: translateY(-2px);
 }
 
-.nominal-tile input {
+.nominal-tile input,
+.paket-tile input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-.nominal-tile:has(input:checked) {
+.nominal-tile:has(input:checked),
+.paket-tile:has(input:checked) {
     border-color: var(--clay);
     background-color: var(--clay-soft);
     box-shadow: var(--shadow-sm);
 }
 
-.nominal-tile:has(input:focus-visible) {
+.nominal-tile:has(input:focus-visible),
+.paket-tile:has(input:focus-visible) {
     box-shadow: 0 0 0 4px var(--clay-soft);
     outline: 2px solid var(--clay);
     outline-offset: 1px;
 }
 
-.nominal-price {
+.nominal-price,
+.paket-jumlah {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.1rem;
@@ -2018,15 +2027,19 @@ h1, h2, h3, .display {
 }
 
 /* Perkiraan Diamond ML di tiap tile nominal — harga per diamond
-   dari riset pasar 17 Nov 2026, satu sumber angka di controller. */
-.nominal-diamond {
+   dari riset pasar 17 Nov 2026, satu sumber angka di controller.
+   .paket-harga/.paket-satuan memakai baris yang sama untuk harga
+   paket dan harga per unit (atau rincian bonus isi paket). */
+.nominal-diamond,
+.paket-harga {
     font-weight: 600;
     font-size: var(--fs-sm);
     color: var(--ink);
     text-align: center;
 }
 
-.nominal-rate {
+.nominal-rate,
+.paket-satuan {
     font-size: var(--fs-xs);
     color: var(--ink-soft);
     text-align: center;
@@ -2034,6 +2047,14 @@ h1, h2, h3, .display {
 
 .nominal-footnote {
     margin-top: 0.75rem;
+}
+
+/* Kelompok paket/nominal yang disembunyikan mengikuti game yang
+   dipilih (atribut hidden diatur server + JS di form top up). */
+.paket-group[hidden],
+.nominal-group[hidden],
+.nominal-footnote[hidden] {
+    display: none;
 }
 
 /* Panel samping gelap — bahasa yang sama dengan .auth-brand. */
@@ -2546,7 +2567,8 @@ h1, h2, h3, .display {
         padding: 1.5rem 1.25rem;
     }
 
-    .nominal-tiles {
+    .nominal-tiles,
+    .paket-tiles {
         grid-template-columns: repeat(2, 1fr);
     }
 

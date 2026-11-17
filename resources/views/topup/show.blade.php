@@ -20,20 +20,25 @@
                 <div class="order-status">
                     <p class="order-status-label">Status order</p>
                     <p class="order-status-value">{{ $order->status }}</p>
-                    <p class="order-status-note">Diamond sedang disiapkan untuk ID {{ $order->game_user_id }}. Pantau perkembangannya di halaman Akun.</p>
+                    <p class="order-status-note">{{ $mataUang }} sedang disiapkan untuk ID {{ $order->game_user_id }}. Pantau perkembangannya di halaman Akun.</p>
                 </div>
                 <p>Mode demo: tidak ada pembayaran sungguhan. Order ini hanya contoh alur top up.</p>
                 <dl class="spec-list">
                     <div class="spec-row"><dt>Game</dt><dd>{{ $order->game }}</dd></div>
                     <div class="spec-row"><dt>Mata Uang</dt><dd>{{ $mataUang }}</dd></div>
-                    <div class="spec-row"><dt>Nominal</dt><dd>{{ $order->getNominalLabel() }}</dd></div>
-                    @if ($order->game === 'Mobile Legends')
-                        <div class="spec-row"><dt>Perkiraan Diamond</dt><dd>±{{ number_format($estimasiDiamond['diamond'], 0, ',', '.') }} Diamond (Rp {{ number_format($estimasiDiamond['perDiamond'], 0, ',', '.') }} / Diamond)</dd></div>
+                    @if ($order->paket)
+                        <div class="spec-row"><dt>Paket</dt><dd>{{ $order->paket }}</dd></div>
+                        <div class="spec-row"><dt>Harga</dt><dd>{{ $order->getNominalLabel() }}</dd></div>
+                    @else
+                        <div class="spec-row"><dt>Nominal</dt><dd>{{ $order->getNominalLabel() }}</dd></div>
                     @endif
                     <div class="spec-row"><dt>ID Akun Game</dt><dd>{{ $order->game_user_id }}</dd></div>
                     <div class="spec-row"><dt>Status</dt><dd><span class="badge badge-limited">{{ $order->status }}</span></dd></div>
                     <div class="spec-row"><dt>Dibuat</dt><dd>{{ $order->created_at->format('d M Y, H:i') }}</dd></div>
                 </dl>
+                @if ($order->paket)
+                    <p class="form-hint nominal-footnote">Harga paket dari Codashop / itemku, dicek 17 Nov 2026. Harga bisa berubah sewaktu-waktu. Top up ini demo, bukan harga jual.</p>
+                @endif
                 <div class="btn-row">
                     <a class="btn btn-primary" href="{{ route('topup.create') }}">Top Up Lagi</a>
                     <a class="btn btn-secondary" href="{{ route('akun') }}">Lihat Akun Saya</a>
@@ -45,8 +50,8 @@
                 <p>Ordermu sedang menunggu pemrosesan. Langkah berikutnya:</p>
                 <ol class="side-steps">
                     <li class="step-done"><span class="step-no">01</span><span>Order dicatat — selesai.</span><span class="step-state">Selesai</span></li>
-                    <li class="step-active"><span class="step-no">02</span><span>Pemrosesan — diamond sedang disiapkan untuk ID {{ $order->game_user_id }}.</span><span class="step-state">Berjalan</span></li>
-                    <li class="step-next"><span class="step-no">03</span><span>Selesai — diamond masuk ke akun game-mu.</span><span class="step-state">Berikutnya</span></li>
+                    <li class="step-active"><span class="step-no">02</span><span>Pemrosesan — {{ $mataUang }} sedang disiapkan untuk ID {{ $order->game_user_id }}.</span><span class="step-state">Berjalan</span></li>
+                    <li class="step-next"><span class="step-no">03</span><span>Selesai — {{ $mataUang }} masuk ke akun game-mu.</span><span class="step-state">Berikutnya</span></li>
                 </ol>
             </aside>
         </div>

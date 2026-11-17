@@ -79,7 +79,7 @@
                     <div class="order-row">
                         <div>
                             <a href="{{ route('topup.show', $order->id) }}">Order #{{ $order->id }} — {{ $order->game }}</a>
-                            <div class="order-meta">{{ $order->getNominalLabel() }} · ID {{ $order->game_user_id }} · {{ $order->created_at->format('d M Y, H:i') }}</div>
+                            <div class="order-meta">@if ($order->paket){{ $order->paket }} · @endif{{ $order->getNominalLabel() }} · ID {{ $order->game_user_id }} · {{ $order->created_at->format('d M Y, H:i') }}</div>
                         </div>
                         <span class="badge badge-limited">{{ $order->status }}</span>
                     </div>
