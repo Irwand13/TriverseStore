@@ -36,10 +36,13 @@
                                 <label class="nominal-tile">
                                     <input type="radio" name="nominal" value="{{ $nilai }}" @checked(old('nominal') == $nilai || (old('nominal') === null && $loop->first)) required>
                                     <span class="nominal-price">{{ $label }}</span>
+                                    <span class="nominal-diamond">±{{ number_format($tarifDiamond[$nilai]['diamond'], 0, ',', '.') }} Diamond ML</span>
+                                    <span class="nominal-rate">Rp {{ number_format($tarifDiamond[$nilai]['perDiamond'], 0, ',', '.') }} / Diamond</span>
                                 </label>
                             @endforeach
                         </div>
                         @error('nominal')<p class="form-error">{{ $message }}</p>@enderror
+                        <p class="form-hint nominal-footnote">Perkiraan Diamond Mobile Legends berdasarkan harga pasar (Codashop, itemku, VYGaming, Sehtzone — dicek 17 Nov 2026). Harga bisa berubah; mata uang game lain beda nilainya. Top up ini demo, bukan harga jual.</p>
                     </div>
                     <div class="form-group">
                         <label for="game_user_id">ID Akun Game</label>

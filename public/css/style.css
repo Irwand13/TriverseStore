@@ -1972,9 +1972,11 @@ h1, h2, h3, .display {
 .nominal-tile {
     position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 56px;
+    gap: 0.15rem;
+    min-height: 84px;
     padding: 0.75rem 0.5rem;
     background-color: var(--white);
     border: 1px solid var(--line-dark);
@@ -2013,6 +2015,25 @@ h1, h2, h3, .display {
     font-size: 1.1rem;
     color: var(--ink);
     text-align: center;
+}
+
+/* Perkiraan Diamond ML di tiap tile nominal — harga per diamond
+   dari riset pasar 17 Nov 2026, satu sumber angka di controller. */
+.nominal-diamond {
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    color: var(--ink);
+    text-align: center;
+}
+
+.nominal-rate {
+    font-size: var(--fs-xs);
+    color: var(--ink-soft);
+    text-align: center;
+}
+
+.nominal-footnote {
+    margin-top: 0.75rem;
 }
 
 /* Panel samping gelap — bahasa yang sama dengan .auth-brand. */

@@ -27,6 +27,9 @@
                     <div class="spec-row"><dt>Game</dt><dd>{{ $order->game }}</dd></div>
                     <div class="spec-row"><dt>Mata Uang</dt><dd>{{ $mataUang }}</dd></div>
                     <div class="spec-row"><dt>Nominal</dt><dd>{{ $order->getNominalLabel() }}</dd></div>
+                    @if ($order->game === 'Mobile Legends')
+                        <div class="spec-row"><dt>Perkiraan Diamond</dt><dd>±{{ number_format($estimasiDiamond['diamond'], 0, ',', '.') }} Diamond (Rp {{ number_format($estimasiDiamond['perDiamond'], 0, ',', '.') }} / Diamond)</dd></div>
+                    @endif
                     <div class="spec-row"><dt>ID Akun Game</dt><dd>{{ $order->game_user_id }}</dd></div>
                     <div class="spec-row"><dt>Status</dt><dd><span class="badge badge-limited">{{ $order->status }}</span></dd></div>
                     <div class="spec-row"><dt>Dibuat</dt><dd>{{ $order->created_at->format('d M Y, H:i') }}</dd></div>

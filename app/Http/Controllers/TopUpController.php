@@ -15,6 +15,7 @@ class TopUpController extends Controller
         return view('topup.create', [
             'games' => $this->gameList(),
             'nominals' => $this->nominalList(),
+            'tarifDiamond' => $this->diamondTariff(),
         ]);
     }
 
@@ -51,6 +52,7 @@ class TopUpController extends Controller
         return view('topup.show', [
             'order' => $order,
             'mataUang' => $this->gameList()[$order->game],
+            'estimasiDiamond' => $this->diamondEstimate($order->nominal),
         ]);
     }
 
@@ -81,5 +83,28 @@ class TopUpController extends Controller
             250000 => 'Rp 250.000',
             500000 => 'Rp 500.000',
         ];
+    }
+
+    // Tarif perkiraan Diamond Mobile Legends per nominal rupiah,
+    // dari riset harga pasar (Codashop, itemku, VYGaming, Sehtzone —
+    // dicek 17 Nov 2026). Estimasi dibulatkan ke bawah, pakai tanda ±.
+    // Satu sumber angka: create + show membaca tabel yang sama.
+    private function diamondTariff(): array
+    {
+        return [
+            10000 => ['diamond' => 42, 'perDiamond' => 238],
+            20000 => ['diamond' => 85, 'perDiamond' => 238],
+            50000 => ['diamond' => 213, 'perDiamond' => 235],
+            100000 => ['diamond' => 426, 'perDiamond' => 235],
+            150000 => ['diamond' => 638, 'perDiamond' => 234],
+            250000 => ['diamond' => 1064, 'perDiamond' => 232],
+            500000 => ['diamond' => 2128, 'perDiamond' => 228],
+        ];
+    }
+
+    // Estimasi Diamond ML untuk satu nominal rupiah.
+    private function diamondEstimate(int $nominal): array
+    {
+        return $this->diamondTariff()[$nominal] ?? ['diamond' => 0, 'perDiamond' => 0];
     }
 }
