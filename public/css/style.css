@@ -1904,6 +1904,240 @@ h1, h2, h3, .display {
     margin-top: 1.5rem;
 }
 
+/* ---------- Top up: polish v2.1 — satu keluarga dengan auth + home ----------
+   Head memakai wash + titik-titik hero, judul digarisbawahi terracotta
+   seperti section-head/auth. Nominal jadi tile pilihan visual ala
+   GameVault 05-topup (bukan dropdown polos — pola produk nyata);
+   game tetap select (8 nama panjang, tile akan berisik). Panel samping
+   gelap ink, bahasa yang sama dengan panel auth + pita rekber. */
+.topup-head {
+    background-image: radial-gradient(var(--line-dark) 1px, transparent 1.5px), linear-gradient(180deg, var(--clay-soft) 0%, var(--paper) 78%);
+    background-size: 22px 22px, auto;
+    border-bottom: 1px solid var(--line);
+    padding: 2rem 1.5rem 1.75rem;
+    margin-bottom: 1.75rem;
+}
+
+.topup-head .eyebrow {
+    margin-top: 0.75rem;
+    /* .page-head p lebih spesifik dari .eyebrow — warna pill sage
+       ditegaskan di sini supaya tidak jadi teks redup biasa. */
+    color: var(--sage-dark);
+    background-color: var(--sage-soft);
+    border-color: var(--sage);
+    padding-inline: 0.75rem;
+}
+
+.topup-head h1 {
+    /* Garis bawah terracotta mengikuti lebar teks, seperti section-head. */
+    text-decoration: underline;
+    text-decoration-color: var(--clay);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 8px;
+    padding-bottom: 0.25rem;
+}
+
+.topup-card h2 {
+    text-decoration: underline;
+    text-decoration-color: var(--clay);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 8px;
+    padding-bottom: 0.25rem;
+}
+
+/* Nomor langkah 01–03 di depan tiap label field — murni CSS (counter),
+   tanpa mengubah markup form atau payload POST. */
+.topup-card form {
+    counter-reset: topup-step;
+}
+
+.topup-card .form-group > label::before {
+    counter-increment: topup-step;
+    content: counter(topup-step, decimal-leading-zero);
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--clay);
+    margin-right: 0.5rem;
+}
+
+/* Nominal sebagai tile radio: name/value SAMA dengan select lama, jadi
+   payload POST + validasi + old() tetap identik. Tile pertama terpilih
+   secara default — sama seperti select yang selalu mengirim opsi pertama. */
+.nominal-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+
+.nominal-tile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 0.75rem 0.5rem;
+    background-color: var(--white);
+    border: 1px solid var(--line-dark);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+}
+
+.nominal-tile:hover {
+    border-color: var(--clay);
+    transform: translateY(-2px);
+}
+
+.nominal-tile input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.nominal-tile:has(input:checked) {
+    border-color: var(--clay);
+    background-color: var(--clay-soft);
+    box-shadow: var(--shadow-sm);
+}
+
+.nominal-tile:has(input:focus-visible) {
+    box-shadow: 0 0 0 4px var(--clay-soft);
+    outline: 2px solid var(--clay);
+    outline-offset: 1px;
+}
+
+.nominal-price {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--ink);
+    text-align: center;
+}
+
+/* Panel samping gelap — bahasa yang sama dengan .auth-brand. */
+.side-card--dark {
+    background-color: var(--ink);
+    color: var(--paper);
+    border-top: 3px solid var(--clay);
+}
+
+.side-card--dark h3 {
+    color: var(--paper);
+}
+
+.side-card--dark > p {
+    color: var(--ink-on-dark);
+}
+
+.side-card--dark .side-steps .step-no {
+    color: var(--sage);
+}
+
+/* Penanda status langkah di halaman ringkasan order. */
+.side-steps li {
+    flex-wrap: wrap;
+}
+
+.side-steps li > span:nth-child(2) {
+    flex: 1;
+}
+
+.step-state {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.step-done .step-state {
+    background-color: var(--sage-soft);
+    color: var(--sage-dark);
+    border-color: var(--sage);
+}
+
+.step-done .step-no {
+    color: var(--sage);
+}
+
+.step-active .step-state {
+    background-color: var(--clay-soft);
+    color: var(--clay-dark);
+    border-color: var(--clay);
+}
+
+.step-next .step-state {
+    background-color: var(--paper);
+    color: var(--ink-soft);
+    border-color: var(--line-dark);
+}
+
+.step-next .step-no {
+    color: var(--ink-on-dark);
+}
+
+/* Banner status order — status menonjol, bukan sekadar baris spek. */
+.order-status {
+    background-color: var(--clay-soft);
+    border-left: 4px solid var(--clay);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.order-status-label {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--clay-dark);
+}
+
+.order-status-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--clay-dark);
+    margin-top: 0.25rem;
+}
+
+.order-status-note {
+    font-size: var(--fs-sm);
+    color: var(--ink-soft);
+    margin-top: 0.25rem;
+    line-height: 1.55;
+}
+
+/* Entrance: bahasa yang sama dengan hero-rise + auth — fade + naik 14px,
+   berurutan. Tanpa float/pulse/loop (unslop §9). */
+.topup-head,
+.topup-card,
+.topup-card .form-group,
+.topup-card .btn-block,
+.topup-card .order-status,
+.topup-card .spec-list,
+.topup-card .btn-row,
+.topup-side {
+    animation: hero-rise 600ms var(--ease) both;
+}
+
+.topup-card { animation-delay: 90ms; }
+.topup-card .form-group:nth-of-type(1) { animation-delay: 150ms; }
+.topup-card .form-group:nth-of-type(2) { animation-delay: 220ms; }
+.topup-card .form-group:nth-of-type(3) { animation-delay: 290ms; }
+.topup-card .btn-block { animation-delay: 360ms; }
+.topup-card .order-status { animation-delay: 150ms; }
+.topup-card .spec-list { animation-delay: 220ms; }
+.topup-card .btn-row { animation-delay: 290ms; }
+.topup-side { animation-delay: 150ms; }
+
+/* Hover lift tombol di halaman top up — sama seperti auth. */
+.topup-card .btn-primary:hover,
+.topup-card .btn-secondary:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
 /* ---------- Akun: kepala profil + statistik ---------- */
 .profile-head {
     display: flex;
@@ -2081,12 +2315,15 @@ h1, h2, h3, .display {
 .auth-card .btn-block { animation-delay: 430ms; }
 .auth-card .auth-foot { animation-delay: 500ms; }
 
-/* Fokus input: ring lembut clay-soft di atas outline yang sudah ada. */
-.form-group input {
+/* Fokus input: ring lembut clay-soft di atas outline yang sudah ada.
+   Select ikut dapat ring yang sama (dipakai halaman top up). */
+.form-group input,
+.form-group select {
     transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
     box-shadow: 0 0 0 4px var(--clay-soft);
 }
 
@@ -2281,6 +2518,15 @@ h1, h2, h3, .display {
 
     .auth-layout .form-card {
         padding: 1.75rem 1.5rem 1.5rem;
+    }
+
+    /* Top up HP: head merapat, tile nominal 2 kolom. */
+    .topup-head {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .nominal-tiles {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .hero h1 {

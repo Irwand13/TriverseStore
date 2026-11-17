@@ -2,20 +2,26 @@
 
 @section('content')
     <div class="container">
-        <div class="page-head">
+        <div class="page-head topup-head">
             <nav class="breadcrumb" aria-label="Breadcrumb">
                 <a href="{{ route('topup.create') }}">Top Up</a>
                 <span>/</span>
                 <span class="crumb-here">Order #{{ $order->id }}</span>
             </nav>
+            <p class="eyebrow">Order Dicatat · Menunggu Pemrosesan</p>
             <h1>Order Top Up #{{ $order->id }}</h1>
             <p>Ringkasan order top up game-mu.</p>
         </div>
 
         <div class="topup-layout">
-            <div class="form-card">
+            <div class="form-card topup-card">
                 <p class="form-step">Langkah 2 dari 3 — Order dicatat</p>
                 <h2>Ringkasan order</h2>
+                <div class="order-status">
+                    <p class="order-status-label">Status order</p>
+                    <p class="order-status-value">{{ $order->status }}</p>
+                    <p class="order-status-note">Diamond sedang disiapkan untuk ID {{ $order->game_user_id }}. Pantau perkembangannya di halaman Akun.</p>
+                </div>
                 <p>Mode demo: tidak ada pembayaran sungguhan. Order ini hanya contoh alur top up.</p>
                 <dl class="spec-list">
                     <div class="spec-row"><dt>Game</dt><dd>{{ $order->game }}</dd></div>
@@ -31,13 +37,13 @@
                 </div>
             </div>
 
-            <aside class="side-card">
+            <aside class="side-card side-card--dark topup-side">
                 <h3>Status order</h3>
                 <p>Ordermu sedang menunggu pemrosesan. Langkah berikutnya:</p>
                 <ol class="side-steps">
-                    <li><span class="step-no">01</span><span>Order dicatat — selesai.</span></li>
-                    <li><span class="step-no">02</span><span>Pemrosesan — diamond sedang disiapkan untuk ID {{ $order->game_user_id }}.</span></li>
-                    <li><span class="step-no">03</span><span>Selesai — diamond masuk ke akun game-mu.</span></li>
+                    <li class="step-done"><span class="step-no">01</span><span>Order dicatat — selesai.</span><span class="step-state">Selesai</span></li>
+                    <li class="step-active"><span class="step-no">02</span><span>Pemrosesan — diamond sedang disiapkan untuk ID {{ $order->game_user_id }}.</span><span class="step-state">Berjalan</span></li>
+                    <li class="step-next"><span class="step-no">03</span><span>Selesai — diamond masuk ke akun game-mu.</span><span class="step-state">Berikutnya</span></li>
                 </ol>
             </aside>
         </div>

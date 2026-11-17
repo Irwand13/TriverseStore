@@ -2,19 +2,20 @@
 
 @section('content')
     <div class="container">
-        <div class="page-head">
+        <div class="page-head topup-head">
             <nav class="breadcrumb" aria-label="Breadcrumb">
                 <a href="{{ route('products.index') }}">Beranda</a>
                 <span>/</span>
                 <span class="crumb-here">Top Up</span>
             </nav>
+            <p class="eyebrow">Top-Up Demo · Tanpa Payment Gateway</p>
             <h1>Top Up Game</h1>
             <p>Isi game, nominal, dan ID akun game-mu. Order langsung dicatat dan bisa dilihat di halaman Akun.</p>
         </div>
 
         <div class="topup-layout">
-            <div class="form-card">
-                <p class="form-step">Langkah 1 dari 3 — Pilih game</p>
+            <div class="form-card topup-card">
+                <p class="form-step">Top up demo — tiga langkah</p>
                 <h2>Isi detail top up</h2>
                 <p>Mode demo: tidak ada pembayaran sungguhan dan tidak ada payment gateway. Order hanya dicatat sebagai contoh alur.</p>
                 <form method="POST" action="{{ route('topup.store') }}">
@@ -29,12 +30,15 @@
                         @error('game')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
                     <div class="form-group">
-                        <label for="nominal">Nominal</label>
-                        <select id="nominal" name="nominal" required>
+                        <label id="nominal-label">Nominal</label>
+                        <div class="nominal-tiles" role="radiogroup" aria-labelledby="nominal-label">
                             @foreach ($nominals as $nilai => $label)
-                                <option value="{{ $nilai }}" @selected(old('nominal') == $nilai)>{{ $label }}</option>
+                                <label class="nominal-tile">
+                                    <input type="radio" name="nominal" value="{{ $nilai }}" @checked(old('nominal') == $nilai || (old('nominal') === null && $loop->first)) required>
+                                    <span class="nominal-price">{{ $label }}</span>
+                                </label>
                             @endforeach
-                        </select>
+                        </div>
                         @error('nominal')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
                     <div class="form-group">
@@ -50,7 +54,7 @@
                 @endguest
             </div>
 
-            <aside class="side-card">
+            <aside class="side-card side-card--dark topup-side">
                 <h3>Alur top up</h3>
                 <p>Tiga langkah dari form sampai diamond masuk ke akunmu.</p>
                 <ol class="side-steps">
