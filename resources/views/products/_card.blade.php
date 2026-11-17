@@ -2,7 +2,7 @@
      hanya tautannya (route Laravel) dan aksi CRUD di bawahnya. --}}
 <article class="game-card">
     <div class="card-media">
-        <img src="{{ asset('assets/img/' . $product->gambar) }}" alt="Key art {{ $product->game }}">
+        <img src="{{ $product->getGambarUrl() }}" alt="Key art {{ $product->game }}">
         @if ($product->diskon > 0)
             <span class="badge badge-promo">&minus;{{ $product->diskon }}%</span>
         @endif

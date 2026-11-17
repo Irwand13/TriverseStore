@@ -11,11 +11,17 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
-        'kode', 'judul', 'game', 'kategori',
+        'user_id', 'kode', 'judul', 'game', 'kategori',
         'seller_nama', 'seller_rating', 'seller_penjualan', 'seller_kota',
         'harga', 'diskon', 'status', 'gambar',
         'deskripsi_singkat', 'deskripsi', 'platform', 'level', 'item_unggulan',
     ];
+
+    // Akun yang membuat listing; null untuk sepuluh produk seeder.
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     protected $casts = [
         'seller_rating' => 'float',
@@ -23,6 +29,17 @@ class Product extends Model
         'harga' => 'integer',
         'diskon' => 'integer',
     ];
+
+    // URL publik gambar: upload user tinggal di uploads/products,
+    // sepuluh key art seeder tetap di assets/img.
+    public function getGambarUrl(): string
+    {
+        if (str_starts_with($this->gambar, 'uploads/')) {
+            return asset($this->gambar);
+        }
+
+        return asset('assets/img/' . $this->gambar);
+    }
 
     // Harga akhir yang dibayar pembeli; kolom harga di dataset
     // sudah merupakan harga final setelah diskon.

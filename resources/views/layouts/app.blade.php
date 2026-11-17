@@ -15,12 +15,22 @@
         <div class="container header-inner">
             <a class="wordmark" href="{{ route('products.index') }}">Triverse<span class="accent">Store</span></a>
             <nav class="main-nav">
-                <a href="{{ route('products.index') }}" class="active">Katalog</a>
-                <a href="{{ route('products.index') }}#rekber">Cara Rekber</a>
-                <a href="{{ route('products.index') }}#tentang">Tentang</a>
+                <a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.index') ? 'active' : '' }}">Beranda</a>
+                <a href="{{ route('market') }}" class="{{ request()->routeIs('market') ? 'active' : '' }}">Market</a>
+                <a href="{{ route('topup.create') }}" class="{{ request()->routeIs('topup.*') ? 'active' : '' }}">Top Up</a>
+                <a href="{{ route('tentang') }}" class="{{ request()->routeIs('tentang') ? 'active' : '' }}">Tentang</a>
             </nav>
             <div class="header-actions">
-                <a class="btn btn-secondary btn-sm" href="{{ route('products.index') }}#katalog">Masuk</a>
+                @auth
+                    <a class="btn btn-secondary btn-sm" href="{{ route('akun') }}">{{ auth()->user()->name }}</a>
+                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                        @csrf
+                        <button class="btn btn-secondary btn-sm" type="submit">Keluar</button>
+                    </form>
+                @else
+                    <a class="btn btn-secondary btn-sm" href="{{ route('login') }}">Masuk</a>
+                    <a class="btn btn-secondary btn-sm" href="{{ route('register') }}">Daftar</a>
+                @endauth
                 <a class="btn btn-primary btn-sm" href="{{ route('products.create') }}">Jual Akun</a>
             </div>
         </div>
@@ -44,9 +54,9 @@
                 <div>
                     <h3>Marketplace</h3>
                     <ul class="footer-links">
-                        <li><a href="{{ route('products.index') }}#katalog">Katalog Akun</a></li>
-                        <li><a href="{{ route('products.index') }}#rekber">Cara Rekber</a></li>
-                        <li><a href="{{ route('products.index') }}#tentang">Tentang Kami</a></li>
+                        <li><a href="{{ route('market') }}">Market</a></li>
+                        <li><a href="{{ route('topup.create') }}">Top Up Game</a></li>
+                        <li><a href="{{ route('tentang') }}">Tentang Kami</a></li>
                     </ul>
                 </div>
                 <div>
@@ -54,7 +64,7 @@
                     <ul class="footer-links">
                         <li><a href="{{ route('products.index') }}#rekber">Panduan Pembeli</a></li>
                         <li><a href="{{ route('products.index') }}#rekber">Panduan Penjual</a></li>
-                        <li><a href="{{ route('products.index') }}#tentang">Hubungi Kami</a></li>
+                        <li><a href="{{ route('akun') }}">Akun Saya</a></li>
                     </ul>
                 </div>
             </div>
