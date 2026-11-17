@@ -7,7 +7,7 @@
                 <div class="form-card">
                     <h2>Ubah Produk</h2>
                     <p>Mengubah listing "{{ $product->judul }}". Penjual mengikuti akunmu dan tidak bisa diubah dari sini.</p>
-                    <form method="POST" action="{{ route('products.update', $product->id) }}">
+                    <form method="POST" action="{{ route('products.update', $product->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         @include('products._form', ['product' => $product, 'submitLabel' => 'Simpan Perubahan'])

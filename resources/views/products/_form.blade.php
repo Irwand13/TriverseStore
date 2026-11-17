@@ -38,13 +38,17 @@
 </div>
 
 <div class="form-group">
-    <label for="gambar">Gambar Produk (opsional)</label>
-    <select id="gambar" name="gambar">
-        <option value="">Pilih otomatis dari nama game</option>
-        @foreach ($gambarList as $file => $namaGame)
-            <option value="{{ $file }}" @selected(old('gambar', $product->gambar ?? '') === $file)>{{ $namaGame }} ({{ $file }})</option>
-        @endforeach
-    </select>
+    <label for="gambar">Gambar Akun (wajib)</label>
+    @isset($product)
+        <div style="margin-bottom: 0.5rem;">
+            <img src="{{ $product->getGambarUrl() }}" alt="Gambar {{ $product->game }}" style="max-width: 220px; border-radius: 8px;">
+        </div>
+        <p style="font-size: 0.85rem; margin-bottom: 0.5rem;">Kosongkan bila tetap memakai gambar di atas.</p>
+        <input type="file" id="gambar" name="gambar" accept="image/*">
+    @else
+        <input type="file" id="gambar" name="gambar" accept="image/*" required>
+    @endisset
+    <p style="font-size: 0.85rem; margin-top: 0.3rem;">Format JPG, JPEG, PNG, atau WebP, maksimal 2 MB.</p>
     @error('gambar')<p style="color: var(--clay-dark); font-size: 0.85rem; margin-top: 0.3rem;">{{ $message }}</p>@enderror
 </div>
 

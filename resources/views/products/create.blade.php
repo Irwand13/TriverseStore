@@ -7,7 +7,7 @@
                 <div class="form-card">
                     <h2>Tambah Produk Baru</h2>
                     <p>Isi detail akun game yang akan dijual. Data tersimpan ke database dan langsung tampil di katalog.</p>
-                    <form method="POST" action="{{ route('products.store') }}">
+                    <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
                         @csrf
                         @include('products._form', ['product' => null, 'submitLabel' => 'Simpan Produk'])
                     </form>

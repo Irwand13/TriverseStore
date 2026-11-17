@@ -21,7 +21,7 @@
 
         <div class="detail-grid">
             <div class="detail-media">
-                <img src="{{ asset('assets/img/' . $product->gambar) }}" alt="Key art {{ $product->game }}">
+                <img src="{{ $product->getGambarUrl() }}" alt="Key art {{ $product->game }}">
             </div>
 
             <div class="detail-info">

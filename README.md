@@ -107,11 +107,18 @@ paket dev). Ekstensi `pdo_sqlite` harus aktif di php.ini Laragon
   jual akun: rute create/store/edit/update/destroy dipagari middleware
   `auth`; tamu diarahkan ke `/login`.
 - **Form listing dipendekkan** (`products/_form.blade.php`): tinggal
-  judul, game, kategori, harga, deskripsi singkat, gambar opsional.
+  judul, game, kategori, harga, deskripsi singkat, gambar.
   Kode dibuat otomatis (`P` + id), penjual diisi dari nama akun login,
   kolom lain diisi default oleh Controller. Migration baru
   `add_user_id_to_products_table` mengikat listing ke akun pembuatnya
   supaya tampil di "Listing saya".
+- **Gambar listing wajib di-upload sendiri** (JPG/JPEG/PNG/WebP,
+  maks 2 MB): form memakai input file (`enctype="multipart/form-data"`),
+  validasi `required|image` saat tambah; saat ubah boleh kosong dan
+  gambar lama tetap dipakai, upload baru menggantikan file lama.
+  File tersimpan di `public/uploads/products/` (nama unik) sehingga
+  langsung tampil tanpa `storage:link`. Tidak ada lagi gambar default
+  dari nama game — listing tanpa upload gambar ditolak validasi.
 - **Top up:** tabel `top_up_orders` (game, nominal, ID akun game,
   status demo "Menunggu"); order milik user login tampil di Akun.
 
@@ -120,11 +127,11 @@ Update di laptop yang sudah jalan Week 9:
 ```powershell
 cd "D:\SEMESTER 5\WEB\Project\TriverseStore"
 git pull origin week9
-php artisan migrate
 php artisan serve
 ```
 
-Tidak perlu `composer install` ulang (tidak ada package baru).
+Tidak perlu `composer install` ulang (tidak ada package baru) dan
+tidak perlu `migrate` (tidak ada perubahan skema database).
 Akun lama tidak ada — daftar dulu lewat `/register` sebelum
 mencoba tombol Jual Akun.
 

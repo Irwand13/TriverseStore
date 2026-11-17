@@ -30,6 +30,17 @@ class Product extends Model
         'diskon' => 'integer',
     ];
 
+    // URL publik gambar: upload user tinggal di uploads/products,
+    // sepuluh key art seeder tetap di assets/img.
+    public function getGambarUrl(): string
+    {
+        if (str_starts_with($this->gambar, 'uploads/')) {
+            return asset($this->gambar);
+        }
+
+        return asset('assets/img/' . $this->gambar);
+    }
+
     // Harga akhir yang dibayar pembeli; kolom harga di dataset
     // sudah merupakan harga final setelah diskon.
     public function getHargaAkhir(): int

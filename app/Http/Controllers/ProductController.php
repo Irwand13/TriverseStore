@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 // Controller tetap menjadi perantara seperti di Week 7: menerima
 // request, meminta data ke Model, lalu meneruskan ke View.
@@ -89,16 +90,16 @@ class ProductController extends Controller
     {
         return view('products.create', [
             'kategoriList' => $this->kategoriList(),
-            'gambarList' => $this->gambarList(),
         ]);
     }
 
     // Simpan produk baru dari form. Penjual diisi dari akun
     // yang login; kolom yang tidak ada di form diisi default
-    // supaya listing langsung tampil di katalog.
+    // supaya listing langsung tampil di katalog. Gambar wajib
+    // di-upload user — tidak ada lagi gambar default.
     public function store(Request $request)
     {
-        $data = $request->validate($this->rules());
+        $data = $request->validate($this->rules(true));
 
         $product = Product::create([
             'user_id' => $request->user()->id,
@@ -113,7 +114,7 @@ class ProductController extends Controller
             'harga' => $data['harga'],
             'diskon' => 0,
             'status' => 'Tersedia',
-            'gambar' => $data['gambar'] ?? $this->gambarUntukGame($data['game']),
+            'gambar' => $this->simpanGambar($request),
             'deskripsi_singkat' => $data['deskripsi_singkat'],
             'deskripsi' => $data['deskripsi_singkat'],
             'platform' => 'Semua Platform',
@@ -134,27 +135,33 @@ class ProductController extends Controller
         return view('products.edit', [
             'product' => $product,
             'kategoriList' => $this->kategoriList(),
-            'gambarList' => $this->gambarList(),
         ]);
     }
 
     // Simpan perubahan dari form ubah. Hanya kolom form yang
     // berubah; penjual dan data lain tetap seperti semula.
+    // Gambar lama tetap dipakai bila tidak ada upload baru.
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
         $this->pastikanPemilik($product);
 
-        $data = $request->validate($this->rules());
+        $data = $request->validate($this->rules(false));
 
-        $product->update([
+        $perubahan = [
             'judul' => $data['judul'],
             'game' => $data['game'],
             'kategori' => $data['kategori'],
             'harga' => $data['harga'],
             'deskripsi_singkat' => $data['deskripsi_singkat'],
-            'gambar' => $data['gambar'] ?? $product->gambar,
-        ]);
+        ];
+
+        if ($request->hasFile('gambar')) {
+            $this->hapusGambarUpload($product->gambar);
+            $perubahan['gambar'] = $this->simpanGambar($request);
+        }
+
+        $product->update($perubahan);
 
         return redirect()->route('products.show', $product->id)
             ->with('sukses', 'Produk "' . $product->judul . '" berhasil diubah.');
@@ -166,6 +173,8 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $this->pastikanPemilik($product);
+
+        $this->hapusGambarUpload($product->gambar);
 
         $judul = $product->judul;
         $product->delete();
@@ -186,7 +195,8 @@ class ProductController extends Controller
     // Aturan validasi form tambah/ubah yang sudah dipendekkan:
     // hanya kolom esensial. Kode dan penjual tidak lagi diisi
     // lewat form, melainkan oleh Controller saat menyimpan.
-    private function rules(): array
+    // Gambar wajib saat tambah, opsional saat ubah (pakai lama).
+    private function rules(bool $gambarWajib): array
     {
         return [
             'judul' => 'required|string|max:255',
@@ -194,43 +204,47 @@ class ProductController extends Controller
             'kategori' => 'required|in:MOBA,RPG,FPS,Battle Royale,Aksi,Olahraga',
             'harga' => 'required|integer|min:1000',
             'deskripsi_singkat' => 'required|string|max:500',
-            'gambar' => 'nullable|string|max:255',
+            'gambar' => ($gambarWajib ? 'required' : 'nullable') . '|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
     }
 
-    // Gambar default mengikuti nama game bila cocok dengan
-    // salah satu key art kanonis; kalau tidak, pakai yang pertama.
-    private function gambarUntukGame(string $game): string
+    // Simpan upload ke public/uploads/products supaya langsung
+    // bisa dibuka lewat URL tanpa storage:link. Nama file unik
+    // dari waktu + slug judul; yang disimpan di database hanya
+    // path relatifnya.
+    private function simpanGambar(Request $request): string
     {
-        foreach ($this->gambarList() as $file => $namaGame) {
-            if (strtolower($namaGame) === strtolower($game)) {
-                return $file;
-            }
+        $file = $request->file('gambar');
+        $nama = time() . '-' . Str::slug($request->input('judul')) . '.' . $file->getClientOriginalExtension();
+        $tujuan = public_path('uploads/products');
+
+        if (! is_dir($tujuan)) {
+            mkdir($tujuan, 0755, true);
         }
 
-        return 'mobile-legends.jpg';
+        $file->move($tujuan, $nama);
+
+        return 'uploads/products/' . $nama;
+    }
+
+    // Hapus file upload lama saat diganti atau saat produk dihapus.
+    // Key art kanonis seeder (assets/img) bukan milik user, jadi
+    // tidak pernah dihapus dari sini.
+    private function hapusGambarUpload(?string $gambar): void
+    {
+        if ($gambar === null || ! str_starts_with($gambar, 'uploads/products/')) {
+            return;
+        }
+
+        $path = public_path($gambar);
+
+        if (is_file($path)) {
+            unlink($path);
+        }
     }
 
     private function kategoriList(): array
     {
         return ['Semua', 'MOBA', 'RPG', 'FPS', 'Battle Royale', 'Aksi', 'Olahraga'];
-    }
-
-    // Sepuluh key art kanonis; form hanya boleh memilih salah satunya
-    // supaya gambar produk tidak pernah salah label.
-    private function gambarList(): array
-    {
-        return [
-            'mobile-legends.jpg' => 'Mobile Legends: Bang Bang',
-            'genshin-impact.jpg' => 'Genshin Impact',
-            'valorant.jpg' => 'Valorant',
-            'apex-legends.jpg' => 'Apex Legends',
-            'free-fire.jpg' => 'Free Fire',
-            'gta-v.jpg' => 'Grand Theft Auto V',
-            'efootball.jpg' => 'eFootball',
-            'honkai-star-rail.jpg' => 'Honkai: Star Rail',
-            'zenless-zone-zero.jpg' => 'Zenless Zone Zero',
-            'elden-ring.jpg' => 'Elden Ring',
-        ];
     }
 }
