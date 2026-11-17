@@ -1,32 +1,17 @@
 <?php
-/* ============================================================
-   Front Controller — Week 7 · Sprint 06 (MVC)
-   Satu-satunya pintu masuk aplikasi. Semua request tiba di
-   sini, dibaca parameter ?page=, lalu diserahkan ke method
-   Controller yang sesuai:
-     (tanpa ?page=)        -> GameController::index()
-     ?page=detail&id=P1    -> GameController::show()
-     ?page=cari (POST)     -> GameController::process()
-     ?page=selain itu      -> halaman 404
-   Jalankan dari folder week7:  php -S localhost:8000 -t public
-   ============================================================ */
 
-require_once __DIR__ . '/../app/Controllers/GameController.php';
+use Illuminate\Http\Request;
 
-$controller = new GameController();
-$page = $_GET['page'] ?? 'home';
+define('LARAVEL_START', microtime(true));
 
-switch ($page) {
-    case 'home':
-        $controller->index();
-        break;
-    case 'detail':
-        $controller->show();
-        break;
-    case 'cari':
-        $controller->process();
-        break;
-    default:
-        $controller->notFound('Halaman "' . $page . '" tidak dikenal.');
-        break;
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
 }
+
+// Register the Composer autoloader...
+require __DIR__.'/../vendor/autoload.php';
+
+// Bootstrap Laravel and handle the request...
+(require_once __DIR__.'/../bootstrap/app.php')
+    ->handleRequest(Request::capture());
